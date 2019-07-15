@@ -1,0 +1,3 @@
+# from .gui import ...
+
+APP_NAME = 'Freighter Planner'

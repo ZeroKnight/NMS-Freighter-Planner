@@ -21,9 +21,11 @@ import platform
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QMainWindow, QAction, QMessageBox)
+from PySide2.QtWidgets import (QMainWindow, QAction, QMessageBox,
+                               QGraphicsScene, QGraphicsView)
 
 from freightplan import APP_NAME
+from freightplan.gui.editor import Editor
 
 class MainWindow(QMainWindow):
   """blah"""
@@ -42,6 +44,9 @@ class MainWindow(QMainWindow):
     self.menubar = self.menuBar()
     self.create_menus()
     self.statusbar = self.statusBar()
+
+    self.editor = Editor()
+    self.setCentralWidget(self.editor.view())
 
 
   # TODO: Connect slots

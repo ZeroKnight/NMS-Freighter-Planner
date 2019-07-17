@@ -21,7 +21,7 @@ import platform
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QMainWindow, QAction, QMessageBox
+from PySide2.QtWidgets import (QMainWindow, QAction, QMessageBox)
 
 from freightplan import APP_NAME
 
@@ -81,6 +81,7 @@ class MainWindow(QMainWindow):
     self.action['exit'] = QAction('E&xit', self)
     self.action['exit'].setShortcut(Qt.CTRL + Qt.Key_Q)
     self.action['exit'].setStatusTip(f'Exit {APP_NAME}')
+    self.action['exit'].setMenuRole(QAction.MenuRole.QuitRole)
     self.action['exit'].triggered.connect(self.close)
 
     self.action['undo'] = QAction('&Undo', self)
@@ -103,6 +104,7 @@ class MainWindow(QMainWindow):
       self.action['prefs'].setShortcut(QKeySequence.Preferences)
     else:
       self.action['prefs'].setShortcut(Qt.CTRL + Qt.Key_P)
+    self.action['prefs'].setMenuRole(QAction.MenuRole.PreferencesRole)
 
     self.action['grid_show'] = QAction('Show &Grid', self)
     self.action['grid_show'].setCheckable(True)
@@ -112,7 +114,13 @@ class MainWindow(QMainWindow):
 
     # TODO: Make a single-window About page with Qt info in a separate pane/tab
     # like other applications
+    self.action['about'] = QAction('&About', self)
+    self.action['about'].setMenuRole(QAction.MenuRole.AboutRole)
+    self.action['about'].setStatusTip(f'Show information about {APP_NAME}')
+
     self.action['about_qt'] = QAction('About &Qt', self)
+    self.action['about_qt'].setMenuRole(QAction.MenuRole.AboutQtRole)
+    self.action['about_qt'].setStatusTip('Show information about the Qt library')
     self.action['about_qt'].triggered \
                            .connect(lambda x: QMessageBox.aboutQt(self))
 
@@ -150,6 +158,7 @@ class MainWindow(QMainWindow):
     menu_view.addAction(self.action['grid_show'])
 
     menu_help = self.menubar.addMenu('&Help')
+    menu_help.addAction(self.action['about'])
     menu_help.addAction(self.action['about_qt'])
 
 

@@ -15,3 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Application GUI classes. Subclassed from Qt classes."""
+
+from .editor  import Editor
+from .palette import Palette
+from .sidebar import Sidebar

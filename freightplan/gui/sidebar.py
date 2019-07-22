@@ -16,11 +16,18 @@
 
 # TODO: docstring
 
+from PySide2.QtWidgets import QDockWidget
+
 # create tab bar (All floors, current floor only, etc.)
 # interface scrolls as more component types are in use
 # each "cell" should probably be a class object
-class Sidebar(...):
+class Sidebar(QDockWidget):
   """Frame acting as the sidebar; holds component breakdown information.
 
   Shows component counts, their material costs, etc.
   """
+
+  def __init__(self, parent=None):
+    """blah"""
+
+    super().__init__('Material Breakdown', parent)

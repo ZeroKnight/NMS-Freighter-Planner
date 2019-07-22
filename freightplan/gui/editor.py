@@ -148,7 +148,6 @@ class Editor(QGraphicsScene):
       for y in range(GRID_SIZE):
         cs = self._cell_size
         rect = QRectF(x * cs, y * cs, cs, cs)
-        # TODO: How can we set the parent AND draw with a pen?
         item = self.addRect(rect, pen)
         item.setParentItem(grid_border)
         self.grid.set_cell(QPoint(x, y), item)

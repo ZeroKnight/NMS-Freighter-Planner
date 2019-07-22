@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource prefix="/images">
+    <file alias="corridor">resources/corridor.png</file>
+    <file alias="corridor-curved">resources/corridor-curved.png</file>
+    <file alias="junction">resources/junction.png</file>
+    <file alias="junction-cross">resources/junction-cross.png</file>
+  </qresource>
+</RCC>

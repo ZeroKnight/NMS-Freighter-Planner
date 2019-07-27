@@ -23,11 +23,10 @@ from PySide2.QtWidgets import (
   QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
 )
 
+from freightplan import GRID_SIZE
+
 # TEMP
 import freightplan.gui.resources_rc
-
-# This will only ever change if Hello Games changes the freighter build area
-GRID_SIZE = 21
 
 class Tile(QGraphicsPixmapItem):
   """Represents a placed component on the Editor grid.

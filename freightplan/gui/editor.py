@@ -167,6 +167,7 @@ class Editor(QGraphicsScene):
 
 
   # TODO: Bound minimum zoom to fit the View area
+  # TODO: create a proper view class and forward sceneevents to it
   def wheelEvent(self, event: QtWidgets.QGraphicsSceneWheelEvent):
     """Implementation.
 
@@ -174,11 +175,15 @@ class Editor(QGraphicsScene):
     """
 
     zoom_factor = 1.15
-    if event.delta() > 0:
-      self.view.scale(zoom_factor, zoom_factor)
+
+    if event.modifiers() & Qt.ControlModifier:
+      if event.delta() > 0:
+        self.view.scale(zoom_factor, zoom_factor)
+      else:
+        self.view.scale(1 / zoom_factor, 1 / zoom_factor)
+      event.accept()
     else:
-      self.view.scale(1 / zoom_factor, 1 / zoom_factor)
-    event.accept()
+      event.ignore()
 
 
   def mousePressEvent(self, event):

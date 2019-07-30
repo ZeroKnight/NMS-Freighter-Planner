@@ -16,7 +16,7 @@
 
 # TODO: docstring
 
-from PySide2.QtCore import QMarginsF, QPoint, QPointF, QRectF, Qt
+from PySide2.QtCore import Slot, QMarginsF, QPoint, QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap, QTransform
 import PySide2.QtWidgets as QtWidgets
 from PySide2.QtWidgets import (
@@ -24,6 +24,8 @@ from PySide2.QtWidgets import (
 )
 
 from freightplan import GRID_SIZE
+
+cellSize = 32 # TEMP: keep this in Plan or something
 
 # TEMP
 import freightplan.gui.resources_rc
@@ -54,54 +56,40 @@ class Tile(QGraphicsPixmapItem):
     self.setPos(self.parentItem().rect().topLeft())
 
 
-class EditorGrid():
-  """Data structure of the grid represented by the Editor class.
+# TODO: slots for changing grid color, opacity, style, etc
+class EditorGrid(QGraphicsObject):
+  """A graphics object responsible for drawing the editor grid."""
 
-  The grid is implemented as a two-dimensional list whose indices are the (x,y)
-  position of a grid cell and whose values are dicts with the following keys:
-    - cell: The underlying QGraphicsRectItem that represents the grid cell
-    - tile: The Tile that was placed
-  """
+  def __init__(self, parent: QGraphicsItem):
+    """Constructor."""
 
-  def __init__(self, editor):
-    """Constructor.
+    super().__init__(parent)
 
-    Initialize the grid with GRID_SIZE rows and columns.
+    self._color = Qt.gray
+    self._style = Qt.SolidLine
+    self._opacity = 1.0
 
-    Args:
-      editor: The Editor instance that this grid belongs to
-    """
+    self._pen = QPen(self._color)
+    self._pen.setStyle(self._style)
 
-    self._grid = [
-      [
-        {'cell': None, 'tile': None} for y in range(GRID_SIZE)
-      ] for x in range(GRID_SIZE)
-    ]
-    self.editor = editor
+    self.setOpacity(self._opacity)
 
 
-  def cell(self, pos: QPoint) -> QGraphicsRectItem:
-    """Return the cell at the given position."""
-
-    return self._grid[pos.x()][pos.y()].get('cell')
-
-
-  def tile(self, pos: QPoint) -> Tile:
-    """Return the Tile at the given position, or None if there isn't one."""
-
-    return self._grid[pos.x()][pos.y()].get('tile', None)
+  @Slot(bool)
+  def setVisible(self, visible):
+    return super().setVisible(visible)
 
 
-  def set_cell(self, pos: QPoint, cell: QGraphicsRectItem):
-    """Set the cell at the given position to cell."""
-
-    self._grid[pos.x()][pos.y()]['cell'] = cell
+  def boundingRect(self):
+    return self.parentItem().boundingRect()
 
 
-  def set_tile(self, pos: QPoint, tile: Tile):
-    """Set the Tile at the given position to tile."""
-
-    self._grid[pos.x()][pos.y()]['tile'] = tile
+  def paint(self, painter, option, widget):
+    painter.setPen(self._pen)
+    end = cellSize * GRID_SIZE
+    for n in range(cellSize, end, cellSize):
+      painter.drawLine(n, 0, n, end)
+      painter.drawLine(0, n, end, n)
 
 
 class Editor(QGraphicsScene):

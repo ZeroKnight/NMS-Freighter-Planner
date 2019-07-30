@@ -39,11 +39,6 @@ class MainWindow(QMainWindow):
     self.setWindowTitle(APP_NAME)
     self.resize(640, 480) # TEMP
 
-    self.create_actions()
-    self.menubar = self.menuBar()
-    self.create_menus()
-    self.statusbar = self.statusBar()
-
     self.editor = Editor(self)
     self.setCentralWidget(self.editor.view)
 
@@ -51,6 +46,12 @@ class MainWindow(QMainWindow):
     self.palette = Palette(self)
     self.addDockWidget(Qt.LeftDockWidgetArea, self.sidebar)
     self.addDockWidget(Qt.RightDockWidgetArea, self.palette)
+
+    self.statusbar = self.statusBar()
+
+    self.create_actions()
+    self.menubar = self.menuBar()
+    self.create_menus()
 
 
   # TODO: Connect slots
@@ -120,6 +121,7 @@ class MainWindow(QMainWindow):
     self.action['grid_show'].setChecked(True)
     self.action['grid_show'].setShortcut(Qt.CTRL + Qt.Key_G)
     self.action['grid_show'].setStatusTip('Toggle display of the editor grid')
+    self.action['grid_show'].triggered.connect(self.editor.grid.setVisible)
 
     # TODO: Make a single-window About page with Qt info in a separate pane/tab
     # like other applications

@@ -24,7 +24,8 @@ from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QMainWindow, QAction, QMessageBox
 
 from freightplan import APP_NAME
-from freightplan.gui import Editor, Sidebar, Palette
+from freightplan.planmanager import PlanManager
+from freightplan.gui import Editor, Palette, Sidebar
 
 class MainWindow(QMainWindow):
   """blah"""
@@ -39,8 +40,8 @@ class MainWindow(QMainWindow):
     self.setWindowTitle(APP_NAME)
     self.resize(640, 480) # TEMP
 
-    self.editor = Editor(self)
-    self.setCentralWidget(self.editor.view)
+    self.manager = PlanManager(self)
+    self.setCentralWidget(self.manager.tabPane)
 
     self.sidebar = Sidebar(self)
     self.palette = Palette(self)
@@ -61,10 +62,12 @@ class MainWindow(QMainWindow):
     self.action['new'] = QAction('&New Plan', self)
     self.action['new'].setShortcut(QKeySequence.New)
     self.action['new'].setStatusTip('Create a new plan')
+    self.action['new'].triggered.connect(self.manager.newPlan)
 
     self.action['open'] = QAction('&Open Plan...', self)
     self.action['open'].setShortcut(QKeySequence.Open)
     self.action['open'].setStatusTip('Open an existing plan')
+    self.action['open'].triggered.connect(self.manager.openPlan)
 
     self.action['reopen'] = QAction('&Reopen Closed Plan', self)
     self.action['reopen'].setShortcut(Qt.CTRL + Qt.SHIFT + Qt.Key_T)
@@ -78,15 +81,18 @@ class MainWindow(QMainWindow):
     # Annoyingly, the QKeySequence.Close primary is Ctrl+F4 on Windows
     self.action['close'].setShortcut(Qt.CTRL + Qt.Key_W)
     self.action['close'].setStatusTip('Close the currently active plan')
+    self.action['close'].triggered.connect(self.manager.closePlan)
 
     self.action['save'] = QAction('&Save Plan', self)
     self.action['save'].setShortcut(QKeySequence.Save)
     self.action['save'].setStatusTip('Save the currently active plan')
+    self.action['save'].triggered.connect(self.manager.savePlan)
 
     self.action['save_as'] = QAction('Save Plan &As', self)
     self.action['save_as'].setShortcut(Qt.CTRL + Qt.SHIFT + Qt.Key_S)
     self.action['save_as'].setStatusTip('Save the currently active plan under '
                                         'a different name')
+    self.action['save_as'].triggered.connect(self.manager.savePlanAs)
 
     self.action['exit'] = QAction('E&xit', self)
     self.action['exit'].setShortcut(Qt.CTRL + Qt.Key_Q)

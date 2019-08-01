@@ -24,6 +24,7 @@ from PySide2.QtWidgets import (
 )
 
 from freightplan import GRID_SIZE
+from freightplan.plan import Plan
 from freightplan.gui.tile import Tile
 
 cellSize = 32 # TEMP: keep this in Plan or something
@@ -70,18 +71,21 @@ class EditorGrid(QGraphicsObject):
 class Editor(QGraphicsScene):
   """QGraphicsScene containing the editing area.
 
-  Defines the grid-space representing the floor layout of the freighter.
+  Encapsulates a Plan, providing an interactive view to visualize and design
+  the floor layout for the plan.
   """
 
-  def __init__(self, parent):
+  def __init__(self, plan: Plan, parent=None):
     """Constructor.
 
     Args:
-      parent: The widget that the Editor belongs to. Usually a MainWindow.
+      plan: The Plan to associate this Editor with.
+      parent: The QObject that the Editor belongs to; typically a PlanManager.
     """
 
     super().__init__(parent)
 
+    self.plan = plan
     self.lastTilePos = None
 
     # TBD: EditorView class?

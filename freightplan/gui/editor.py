@@ -68,6 +68,46 @@ class EditorGrid(QGraphicsObject):
       painter.drawLine(0, n, end, n)
 
 
+class EditorView(QGraphicsView):
+  """QGraphicsView for Editor objects.
+
+  Implements various zoom and scroll interactions, forwarding the rest to the
+  Editor.
+  """
+
+  def __init__(self, editor: 'Editor'):
+    """Constructor.
+
+    Args:
+      editor: The Editor object to view.
+    """
+
+    super().__init__(editor)
+
+    self.zoomFactor = 1.15
+
+    # TODO: implement drag on middle-mouse
+    # self.setDragMode(QGraphicsView.ScrollHandDrag)
+
+
+  # TODO: Bound minimum zoom to fit the View area
+  # TODO: create a proper view class and forward sceneevents to it
+  def wheelEvent(self, event: QtWidgets.QGraphicsSceneWheelEvent):
+    """Implementation.
+
+    Handles zooming the editor's view.
+    """
+
+    if event.modifiers() & Qt.ControlModifier:
+      if event.delta() > 0:
+        self.scale(self.zoomFactor, self.zoomFactor)
+      else:
+        self.scale(1 / self.zoomFactor, 1 / self.zoomFactor)
+      event.accept()
+    else:
+      super().wheelEvent(event)
+
+
 class Editor(QGraphicsScene):
   """QGraphicsScene containing the editing area.
 
@@ -87,11 +127,7 @@ class Editor(QGraphicsScene):
 
     self.plan = plan
     self.lastTilePos = None
-
-    # TBD: EditorView class?
-    self.view = QGraphicsView(self)
-    # TODO: implement drag on middle-mouse
-    # self.view.setDragMode(QGraphicsView.ScrollHandDrag)
+    self.view = EditorView(self)
 
     self.pix = QPixmap(':/images/corridor')
 
@@ -111,26 +147,6 @@ class Editor(QGraphicsScene):
     """Map a scene position to grid coordinates."""
 
     return QPoint(pos.x() // cellSize, pos.y() // cellSize)
-
-
-  # TODO: Bound minimum zoom to fit the View area
-  # TODO: create a proper view class and forward sceneevents to it
-  def wheelEvent(self, event: QtWidgets.QGraphicsSceneWheelEvent):
-    """Implementation.
-
-    Handles zooming the editor's view.
-    """
-
-    zoom_factor = 1.15
-
-    if event.modifiers() & Qt.ControlModifier:
-      if event.delta() > 0:
-        self.view.scale(zoom_factor, zoom_factor)
-      else:
-        self.view.scale(1 / zoom_factor, 1 / zoom_factor)
-      event.accept()
-    else:
-      event.ignore()
 
 
   # TODO: Handle things like selection areas and middle-click scrolling

@@ -20,41 +20,16 @@ from PySide2.QtCore import Slot, QMarginsF, QPoint, QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap, QTransform
 import PySide2.QtWidgets as QtWidgets
 from PySide2.QtWidgets import (
-  QGraphicsRectItem, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
+  QGraphicsItem, QGraphicsObject, QGraphicsScene, QGraphicsView
 )
 
 from freightplan import GRID_SIZE
+from freightplan.gui.tile import Tile
 
 cellSize = 32 # TEMP: keep this in Plan or something
 
 # TEMP
 import freightplan.gui.resources_rc
-
-class Tile(QGraphicsPixmapItem):
-  """Represents a placed component on the Editor grid.
-
-  Consists of a pixmap item whose parent is the grid cell QRect it was placed
-  in. Its bounding rectangle is set to match the parent grid cell.
-  """
-
-  def __init__(self, pixmap: QPixmap, parent: QtWidgets.QGraphicsRectItem):
-    """Constructor.
-
-    Initializes a QGraphicsPixmapItem and set its positon to its parent.
-
-    Args:
-      pixmap: The QPixmap to display for the tile.
-      parent: The QGraphicsRectItem that this tile is a child of.
-    """
-
-    super().__init__(pixmap, parent)
-
-    # Ensure the shape consists of the whole pixmap and not just the opaque
-    # portion, otherwise the background rect would be selected.
-    self.setShapeMode(QGraphicsPixmapItem.BoundingRectShape)
-
-    self.setPos(self.parentItem().rect().topLeft())
-
 
 # TODO: slots for changing grid color, opacity, style, etc
 class EditorGrid(QGraphicsObject):
@@ -107,51 +82,31 @@ class Editor(QGraphicsScene):
 
     super().__init__(parent)
 
+    self.lastTilePos = None
+
     # TBD: EditorView class?
     self.view = QGraphicsView(self)
-    # TODO: implement drag on middle-mouse or maybe ctrl-click. Depends on
-    # other user interactions
+    # TODO: implement drag on middle-mouse
     # self.view.setDragMode(QGraphicsView.ScrollHandDrag)
 
-    self._cell_size = 32 # px
-    self.grid = EditorGrid(self)
     self.pix = QPixmap(':/images/corridor')
 
-    self._init_grid()
+    length = cellSize * GRID_SIZE
 
-
-  def _init_grid(self):
-    """Create the grid for the Editor."""
-
-    length = self._cell_size * GRID_SIZE
-
+    # Create border for grid area
     border_rect = QRectF(0, 0, length, length)
     pen = QPen(Qt.gray)
     brush = QBrush('#5e6787', Qt.SolidPattern)
-    grid_border = self.addRect(border_rect, pen, brush)
     self.setSceneRect(border_rect.marginsAdded(QMarginsF(5, 5, 5, 5)))
 
-    for x in range(GRID_SIZE):
-      for y in range(GRID_SIZE):
-        cs = self._cell_size
-        rect = QRectF(x * cs, y * cs, cs, cs)
-        item = self.addRect(rect, pen)
-        item.setParentItem(grid_border)
-        self.grid.set_cell(QPoint(x, y), item)
+    self.editArea = self.addRect(border_rect, pen, brush)
+    self.grid = EditorGrid(self.editArea)
 
 
-  def get_grid_pos(self, cell: QGraphicsRectItem) -> QPoint:
-    """Get position of grid cell in grid coordinates as a QPoint."""
-
-    rect = cell.rect()
-    return QPoint(cell.mapToScene(rect.topLeft()).toPoint() / self._cell_size)
-
-
-  def scene_to_grid(self, pos: QPointF) -> QPoint:
+  def sceneToGrid(self, pos: QPointF) -> QPoint:
     """Map a scene position to grid coordinates."""
 
-    cs = self._cell_size
-    return QPoint(int(pos.x()) / cs, int(pos.y()) / cs)
+    return QPoint(pos.x() // cellSize, pos.y() // cellSize)
 
 
   # TODO: Bound minimum zoom to fit the View area
@@ -174,32 +129,29 @@ class Editor(QGraphicsScene):
       event.ignore()
 
 
-  def mousePressEvent(self, event):
+  # TODO: Handle things like selection areas and middle-click scrolling
+  def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     """Implementation.
 
-    Handles mouse-presses in the editor. A left-click places a tile on a grid
-    space, while a right-click removes a tile.
+    A left-click places a tile on a grid space, while a right-click removes a
+    tile.
     """
 
     pos = event.buttonDownScenePos(event.button())
     item = self.itemAt(pos, QTransform())
 
-    if not item:
-      event.ignore()
-      return
-
     if event.button() is Qt.LeftButton:
-      if isinstance(item, QGraphicsRectItem):
-        coord = self.get_grid_pos(item)
-        self.grid.set_tile(coord, Tile(self.pix, item))
+      if not isinstance(item, Tile):
+        coord = self.sceneToGrid(pos)
+        t = Tile(self.pix, self.editArea)
+        t.setPos(coord.x() * 32, coord.y() * 32)
         print(f'Placed tile at {coord!s}')
-        assert item is self.grid.cell(coord)
       else:
         event.ignore()
         return
     elif event.button() is Qt.RightButton:
       if isinstance(item, Tile):
-        print(f'Removed tile at {self.scene_to_grid(pos)!s}')
+        print(f'Removed tile at {self.sceneToGrid(pos)!s}')
         self.removeItem(item)
       else:
         event.ignore()
@@ -207,4 +159,36 @@ class Editor(QGraphicsScene):
     event.accept()
 
 
-# TODO: Drag event for placing tiles continuously
+  def mouseMoveEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
+    """Implementation.
+
+    Handles mouse movement events in the editor. Dragging the mouse with a
+    button pressed will place or remove all tiles passed over.
+    """
+
+    pos = event.scenePos()
+    tilePos = self.sceneToGrid(pos)
+    item = self.itemAt(pos, QTransform())
+
+    if tilePos != self.lastTilePos:
+      self.lastTilePos = tilePos
+
+      if event.buttons() & Qt.LeftButton:
+        if not isinstance(item, Tile):
+          t = Tile(self.pix, self.editArea)
+          t.setPos(tilePos.x() * 32, tilePos.y() * 32)
+          print(f'Placed tile at {tilePos!s}')
+          # assert item is self.grid.cell(coord)
+        else:
+          event.ignore()
+          return
+      elif event.buttons() & Qt.RightButton:
+        if isinstance(item, Tile):
+          self.removeItem(item)
+          print(f'Removed tile at {self.sceneToGrid(pos)!s}')
+        else:
+          event.ignore()
+          return
+    else:
+      event.ignore()
+    event.accept()

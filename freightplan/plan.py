@@ -20,7 +20,7 @@ A plan is the typical "document" in freightplan; it represents everything
 about a given freighter layout.
 """
 
-from freightplan import Floor
+from freightplan.floor import Floor
 
 class Plan():
   """A freighter plan. The typical "document" in freightplan."""

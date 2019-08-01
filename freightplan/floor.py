@@ -42,7 +42,7 @@ from PySide2.QtCore import QPoint, QRect, QSize
 from PySide2.QtGui import QColor
 
 from freightplan import GRID_SIZE
-from freightplan import Cell, Plan
+from freightplan.cell import Cell
 
 def mapGridToIndex(pos: QPoint) -> int:
   """Map grid coordinates to a list index."""
@@ -117,7 +117,7 @@ class Floor(IdMixin):
   logical "rooms" or "sectors" to break up parts of the floor.
   """
 
-  def __init__(self, name: str, level: int, plan: Plan,
+  def __init__(self, name: str, level: int, plan: 'Plan',
                visible: bool=False, locked: bool=False):
     """Constructor.
 

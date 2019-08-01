@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .cell import Cell
-from .floor import Floor, Sector
-from .plan import Plan
-
 # Constants
 
 APP_NAME = 'Freighter Planner'
 
 # This will only ever change if Hello Games changes the freighter build area
 GRID_SIZE = 21
+
+# from .cell import Cell
+# from .document import Document
+# from .floor import Floor, Sector
+# from .plan import Plan
+# from .planmanager import PlanManager

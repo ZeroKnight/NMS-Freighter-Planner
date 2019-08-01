@@ -24,7 +24,7 @@ e.g. corridors and rooms.
 
 from PySide2.QtCore import QPoint, QRect
 
-from freightplan.gui import Tile
+from freightplan.gui.tile import Tile
 
 class Cell():
   """A single grid cell. Can contain a Tile."""

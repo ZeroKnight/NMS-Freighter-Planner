@@ -19,3 +19,4 @@
 from .editor  import Editor
 from .palette import Palette
 from .sidebar import Sidebar
+from .tile    import Tile

@@ -24,6 +24,7 @@ Usage information coming soon!
 if __name__ == "__main__":
   import sys
 
+  import freightplan
   from freightplan.app import App
 
   app = App(sys.argv)

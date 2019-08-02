@@ -86,7 +86,7 @@ class EditorView(QGraphicsView):
     super().__init__(editor)
 
     self.zoomFactor = 1.20
-    self.lastMousePos = QPoint()
+    self._lastMousePos = QPoint()
 
 
   # TODO: Need to manage the sceneRect to always be a certain percent larger
@@ -116,12 +116,12 @@ class EditorView(QGraphicsView):
     """
 
     if event.buttons() & Qt.MiddleButton:
-      delta = self.lastMousePos - event.pos()
+      delta = self._lastMousePos - event.pos()
       hBar = self.horizontalScrollBar()
       vBar = self.verticalScrollBar()
       hBar.setValue(hBar.value() + delta.x())
       vBar.setValue(vBar.value() + delta.y())
-      self.lastMousePos = event.pos()
+      self._lastMousePos = event.pos()
     else:
       super().mouseMoveEvent(event)
 
@@ -134,8 +134,8 @@ class EditorView(QGraphicsView):
     """
 
     if event.button() == Qt.MiddleButton:
-      self.lastMousePos = event.pos()
-      self.setCursor(Qt.ClosedHandCursor)
+      self._lastMousePos = event.pos()
+      QtWidgets.QApplication.setOverrideCursor(Qt.ClosedHandCursor)
     else:
       super().mousePressEvent(event)
 
@@ -147,7 +147,7 @@ class EditorView(QGraphicsView):
     """
 
     if event.button() == Qt.MiddleButton:
-      self.setCursor(Qt.ArrowCursor)
+      QtWidgets.QApplication.restoreOverrideCursor()
     else:
       super().mouseReleaseEvent(event)
 

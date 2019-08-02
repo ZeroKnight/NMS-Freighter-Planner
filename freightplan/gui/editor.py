@@ -16,9 +16,10 @@
 
 # TODO: docstring
 
+import PySide2.QtGui as QtGui
+import PySide2.QtWidgets as QtWidgets
 from PySide2.QtCore import Slot, QMarginsF, QPoint, QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap, QTransform
-import PySide2.QtWidgets as QtWidgets
 from PySide2.QtWidgets import (
   QGraphicsItem, QGraphicsObject, QGraphicsScene, QGraphicsView
 )
@@ -84,15 +85,15 @@ class EditorView(QGraphicsView):
 
     super().__init__(editor)
 
-    self.zoomFactor = 1.15
-
-    # TODO: implement drag on middle-mouse
-    # self.setDragMode(QGraphicsView.ScrollHandDrag)
+    self.zoomFactor = 1.20
+    self.lastMousePos = QPoint()
 
 
-  # TODO: Bound minimum zoom to fit the View area
-  # TODO: create a proper view class and forward sceneevents to it
-  def wheelEvent(self, event: QtWidgets.QGraphicsSceneWheelEvent):
+  # TODO: Need to manage the sceneRect to always be a certain percent larger
+  # than the grid area, like in Aseprite and Tiled. This way anchored zooming
+  # and more "free" panning is possible.
+  # TODO: Minimum and maximum zoom levels; zoom widget on statusbar
+  def wheelEvent(self, event: QtGui.QWheelEvent):
     """Implementation.
 
     Handles zooming the editor's view.
@@ -106,6 +107,50 @@ class EditorView(QGraphicsView):
       event.accept()
     else:
       super().wheelEvent(event)
+
+
+  def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+    """Implementation.
+
+    Handles panning the editor view.
+    """
+
+    if event.buttons() & Qt.MiddleButton:
+      delta = self.lastMousePos - event.pos()
+      hBar = self.horizontalScrollBar()
+      vBar = self.verticalScrollBar()
+      hBar.setValue(hBar.value() + delta.x())
+      vBar.setValue(vBar.value() + delta.y())
+      self.lastMousePos = event.pos()
+    else:
+      super().mouseMoveEvent(event)
+
+
+  def mousePressEvent(self, event):
+    """Implementation.
+
+    Set up for panning. Remember this position for later and set the
+    appropriate cursor.
+    """
+
+    if event.button() == Qt.MiddleButton:
+      self.lastMousePos = event.pos()
+      self.setCursor(Qt.ClosedHandCursor)
+    else:
+      super().mousePressEvent(event)
+
+
+  def mouseReleaseEvent(self, event):
+    """Implementation.
+
+    Restore the mouse cursor if we're done panning.
+    """
+
+    if event.button() == Qt.MiddleButton:
+      self.setCursor(Qt.ArrowCursor)
+    else:
+      super().mouseReleaseEvent(event)
+
 
 
 class Editor(QGraphicsScene):

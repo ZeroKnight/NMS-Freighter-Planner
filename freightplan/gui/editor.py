@@ -99,7 +99,8 @@ class EditorView(QGraphicsView):
     Handles zooming the editor's view.
     """
 
-    if event.modifiers() & Qt.ControlModifier:
+    if (event.modifiers() & Qt.ControlModifier
+        and event.orientation() == Qt.Vertical):
       if event.delta() > 0:
         self.scale(self.zoomFactor, self.zoomFactor)
       else:
@@ -150,7 +151,6 @@ class EditorView(QGraphicsView):
       QtWidgets.QApplication.restoreOverrideCursor()
     else:
       super().mouseReleaseEvent(event)
-
 
 
 class Editor(QGraphicsScene):

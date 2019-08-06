@@ -47,6 +47,12 @@ class PlanManager(QObject):
     self._newPlanCount = 1
 
 
+  def currentEditor(self) -> Editor:
+    """Return the Editor in the active tab."""
+
+    return self.tabPane.widget(self.tabPane.currentIndex()).scene()
+
+
   @Slot()
   def newPlan(self):
     """Create a new Plan and add it to the manager.

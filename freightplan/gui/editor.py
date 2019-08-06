@@ -186,6 +186,8 @@ class EditorView(QGraphicsView):
     newSceneRect.moveCenter(editAreaRect.center())
     self.setSceneRect(newSceneRect)
 
+    return newSceneRect
+
 
   # TODO: Zoom widget on statusbar
   # TODO: See how much the delta is on horizontal wheel events and add support

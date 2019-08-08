@@ -310,6 +310,36 @@ class Editor(QGraphicsScene):
     return QPoint(pos.x() // cellSize, pos.y() // cellSize)
 
 
+  def gridToScene(self, pos: QPoint) -> QPointF:
+    """Map grid coordinates to a scene position."""
+
+    return QPointF(pos.x() * cellSize, pos.y() * cellSize)
+
+
+  def validGridPos(self, pos: QPointF) -> bool:
+    """Return whether the given scene position is within the grid."""
+
+    coord = self.sceneToGrid(pos)
+    return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
+
+
+  def placeTile(self, tile: Tile, pos: QPoint):
+    """Places a tile on the Editor.
+
+    Args:
+      tile: The tile to place.
+      pos: The position in grid coordinates to place the tile, given as a
+           QPoint.
+    """
+
+    if self.validGridPos(pos):
+      tile.setVisible(True)
+      scenePos = self.gridToScene(pos)
+      tile.setPos(scenePos)
+    else:
+      raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')
+
+
   # TODO: Handle things like selection areas and middle-click scrolling
   def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     """Implementation.
@@ -321,11 +351,14 @@ class Editor(QGraphicsScene):
     pos = event.buttonDownScenePos(event.button())
     item = self.itemAt(pos, QTransform())
 
+    if not self.validGridPos(pos):
+      event.ignore()
+      return
+
     if event.button() is Qt.LeftButton:
       if not isinstance(item, Tile):
         coord = self.sceneToGrid(pos)
-        t = Tile(self.pix, self.editArea)
-        t.setPos(coord.x() * 32, coord.y() * 32)
+        self.placeTile(Tile(self.pix, self.editArea), coord)
         print(f'Placed tile at {coord!s}')
       else:
         event.ignore()
@@ -354,12 +387,14 @@ class Editor(QGraphicsScene):
     if tilePos != self.lastTilePos:
       self.lastTilePos = tilePos
 
+      if not self.validGridPos(pos):
+        event.ignore()
+        return
+
       if event.buttons() & Qt.LeftButton:
         if not isinstance(item, Tile):
-          t = Tile(self.pix, self.editArea)
-          t.setPos(tilePos.x() * 32, tilePos.y() * 32)
+          self.placeTile(Tile(self.pix, self.editArea), tilePos)
           print(f'Placed tile at {tilePos!s}')
-          # assert item is self.grid.cell(coord)
         else:
           event.ignore()
           return

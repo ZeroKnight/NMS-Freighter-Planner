@@ -14,7 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: docstring
+"""editor.py
+
+Defines classes for the interactive editing area. Editor is a subclass of a
+QGraphicsScene that displays a grid space accepting placement of various
+tiles representing freighter components such as corridors and rooms. Using
+the EditorGrid class, visible grid lines can be drawn on the edit area to
+aide positioning and placement. EditorView is a subclass of a QGraphicsView
+that pairs with an Editor and displays it in the GUI.
+"""
 
 import PySide2.QtGui as QtGui
 import PySide2.QtWidgets as QtWidgets

@@ -190,8 +190,6 @@ class EditorView(QGraphicsView):
 
 
   # TODO: Zoom widget on statusbar
-  # TODO: See how much the delta is on horizontal wheel events and add support
-  # for crazy mice like mine.
   # TODO: handle mice that report deltas finer than 120
   def wheelEvent(self, event: QtGui.QWheelEvent):
     """Implementation.
@@ -213,6 +211,16 @@ class EditorView(QGraphicsView):
       self.updateSceneRect(self.zoom())
       self.setTransformationAnchor(prevAnchor)
       event.accept()
+    elif event.orientation() == Qt.Horizontal:
+      # XXX: Workaround for the insane horizontal scroll delta of 15240 on the
+      # Logitech G502 mouse.
+      if abs(event.delta()) == 15240:
+        newDelta = 120 if event.delta() > 0 else -120
+        event = QtGui.QWheelEvent(
+          event.pos(), event.globalPos(), newDelta, event.buttons(),
+          event.modifiers(), orient=Qt.Horizontal
+        )
+      super().wheelEvent(event)
     else:
       super().wheelEvent(event)
 

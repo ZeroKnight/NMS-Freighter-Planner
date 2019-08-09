@@ -23,6 +23,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QMainWindow, QAction, QMessageBox
 
+import freightplan.gui.iconmanager as IconManager
 from freightplan import APP_NAME
 from freightplan.planmanager import PlanManager
 from freightplan.gui import Editor, Palette, Sidebar
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
 
     super().__init__()
 
+    IconManager._init()
     self.action = {}
 
     self.setWindowTitle(APP_NAME)
@@ -127,7 +129,7 @@ class MainWindow(QMainWindow):
     self.action['grid_show'].setChecked(True)
     self.action['grid_show'].setShortcut(Qt.CTRL + Qt.Key_G)
     self.action['grid_show'].setStatusTip('Toggle display of the editor grid')
-    self.action['grid_show'].triggered.connect(self.editor.grid.setVisible)
+    # self.action['grid_show'].triggered.connect(self.editor.grid.setVisible)
 
     # TODO: Make a single-window About page with Qt info in a separate pane/tab
     # like other applications

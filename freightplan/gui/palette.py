@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: docstring
-"""Freighter component palette."""
+"""palette.py
+
+Freighter component palette. Holds the various components that may be placed
+within a freighter. Each displayed component is a selectable "swatch" that
+determines what tile is placed on the grid.
+"""
 
 from PySide2.QtCore import Slot
 from PySide2.QtGui import QIcon, QPixmap
@@ -23,8 +27,24 @@ from PySide2.QtWidgets import (
   QDockWidget, QFrame, QGridLayout, QLabel, QPushButton, QVBoxLayout
 )
 
-# TODO: Create an icon provider of some nature like qBittorrent?
-import freightplan.gui.resources_rc
+import freightplan.gui.iconmanager as IconManager
+
+def _addToGridLayout(widgets: list, grid: QGridLayout, columns: int):
+  """Add the list of widgets to the given GridLayout.
+
+  Args:
+    widgets: The list of widgets to add to the GridLayout.
+    grid: The GridLayout to add the widgets to.
+    columns: How many columns will be filled before starting a new row.
+    """
+
+  row = col = 0
+  for widget in widgets:
+    grid.addWidget(widget, row, col)
+    col += 1
+    if col == columns:
+      row += 1
+      col = 0
 
 # TBD: Design of the palette
 # Simple grid layout with every component, analogous to a color palette? (meh)
@@ -44,26 +64,31 @@ class Palette(QDockWidget):
 
     super().__init__('Components', parent)
 
+    # TEMP: Kludge until QTranslate is implemented
+    nameMap = {
+      'corridor': 'Straight Corridor',
+      'corridor-curved': 'Curved Corridor',
+      'junction': 'T-Junction',
+      'junction-cross': 'Cross Junction',
+      'room-large': 'Large Room',
+      'room-fleet': 'Fleet Command Room',
+    }
+
     self.frame = QFrame(self)
     # self.frame.setFrameStyle(QFrame.Panel | QFrame.Plain)
     self.setWidget(self.frame)
     self.layout = QVBoxLayout(self.frame)
 
-    self.corridor = QIcon(':/images/corridor')
-    self.xcorridor = QIcon(':/images/junction-cross')
-    self.tcorridor = QIcon(':/images/junction')
-    self.curved = QIcon(':/images/corridor-curved')
-    self.button = QPushButton(self.corridor, '', self.frame)
-    self.button.setToolTip('Straight Corridor')
-    self.button.pressed.connect(self.foo)
+    self.buttons = {}
+    for name, icon in IconManager.componentIcons().items():
+      self.buttons[name] = QPushButton(icon, '', self.frame)
+      self.buttons[name].setToolTip(nameMap[name])
 
     self.layout.addWidget(QLabel('Corridors'))
     self.buttongrid = QGridLayout()
     self.layout.addLayout(self.buttongrid)
-    self.buttongrid.addWidget(self.button)
-    self.buttongrid.addWidget(QPushButton(self.xcorridor, '', self.frame), 0, 1)
-    self.buttongrid.addWidget(QPushButton(self.tcorridor, '', self.frame), 0, 2)
-    self.buttongrid.addWidget(QPushButton(self.curved, '', self.frame), 1, 0)
+    _addToGridLayout(self.buttons.values(), self.buttongrid, 3)
+    self.layout.addStretch(99)
 
 
   @Slot()

@@ -23,35 +23,15 @@ from PySide2.QtGui import QIcon, QPixmap
 
 import freightplan.gui.resources_rc
 
-_iconMap = {}
-_componentList = [
-  'corridor', 'corridor-curved', 'junction', 'junction-cross', 'room-large',
-  'room-fleet'
-]
-
-
-def _init():
-  # Needs to be called after QMainWindow.__init__ or Qt will complain when we
-  # try to add the Icons.
-
-  for name in _componentList:
-    _iconMap[name] = QIcon(f':/images/{name}')
-
-
-def componentIcons() -> dict:
-  """Return a slice of the icon dict containing only freighter components."""
-
-  return {name: _iconMap[name] for name in _componentList}
-
+_iconCache = {}
 
 def getIcon(name: str) -> QIcon:
   """Return the icon with the given name."""
 
-  if name in _iconMap:
-    return _iconMap[name]
-  else:
-    raise KeyError(f"Icon '{name}' not found.'")
+  if name not in _iconCache:
+    _iconCache[name] = QIcon(f':/images/components/{name}')
 
+  return _iconCache[name]
 
 def getPixmap(name: str) -> QPixmap:
   """Return the icon with the given name as a pixmap."""

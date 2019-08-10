@@ -36,7 +36,6 @@ class MainWindow(QMainWindow):
 
     super().__init__()
 
-    IconManager._init()
     self.action = {}
 
     self.setWindowTitle(APP_NAME)
@@ -47,6 +46,7 @@ class MainWindow(QMainWindow):
 
     self.sidebar = Sidebar(self)
     self.palette = Palette(self)
+    self.palette.componentSelected.connect(self.manager.setCurrentEditorTileBrush)
     self.addDockWidget(Qt.LeftDockWidgetArea, self.sidebar)
     self.addDockWidget(Qt.RightDockWidgetArea, self.palette)
 

@@ -298,7 +298,7 @@ class Editor(QGraphicsScene):
     self.view = EditorView(self)
     self.setBackgroundBrush(QBrush(Qt.lightGray))
 
-    self.pix = QPixmap(':/images/corridor')
+    self._tileBrush = None
 
     length = cellSize * GRID_SIZE
 
@@ -310,6 +310,16 @@ class Editor(QGraphicsScene):
     self.editArea = self.addRect(borderRect, pen, brush)
     self.grid = EditorGrid(self.editArea)
     self.view.centerOn(borderRect.center())
+
+
+  def setTileBrush(self, pixmap: QPixmap):
+    """Set the tile to be placed when painting on the Editor.
+
+    Args:
+      pixmap: The tile pixmap to set the brush to.
+    """
+
+    self._tileBrush = pixmap
 
 
   def sceneToGrid(self, pos: QPointF) -> QPoint:
@@ -332,7 +342,7 @@ class Editor(QGraphicsScene):
 
 
   def placeTile(self, tile: Tile, pos: QPoint):
-    """Places a tile on the Editor.
+    """Place a tile on the Editor.
 
     Args:
       tile: The tile to place.
@@ -344,8 +354,47 @@ class Editor(QGraphicsScene):
       tile.setVisible(True)
       scenePos = self.gridToScene(pos)
       tile.setPos(scenePos)
+      print(f'Placed tile at {pos!s}')
     else:
       raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')
+
+
+  def removeTile(self, pos: QPoint):
+    """Remove a tile from the Editor.
+
+    Args:
+      pos: The position in grid coordinates to place the tile, given as a
+           QPoint.
+    """
+
+    if self.validGridPos(pos):
+      scenePos = self.gridToScene(pos)
+      self.removeItem(self.itemAt(scenePos, QTransform()))
+      print(f'Removed tile at {pos!s}')
+    else:
+      raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')
+
+
+  def handleLeftButton(self, pos: QPointF):
+    """Handles the left mouse button for the Editor area."""
+
+    item = self.itemAt(pos, QTransform())
+    coord = self.sceneToGrid(pos)
+    if isinstance(item, Tile):
+      if item.pixmap().cacheKey() != self._tileBrush.cacheKey():
+        self.removeTile(coord)
+      else:
+        return
+    self.placeTile(Tile(self._tileBrush, self.editArea), coord)
+
+
+  def handleRightButton(self, pos: QPointF):
+    """Handles the right mouse button for the Editor area."""
+
+    item = self.itemAt(pos, QTransform())
+    coord = self.sceneToGrid(pos)
+    if isinstance(item, Tile):
+      self.removeTile(coord)
 
 
   # TODO: Handle things like selection areas and middle-click scrolling
@@ -357,27 +406,14 @@ class Editor(QGraphicsScene):
     """
 
     pos = event.buttonDownScenePos(event.button())
-    item = self.itemAt(pos, QTransform())
-
     if not self.validGridPos(pos):
       event.ignore()
       return
 
     if event.button() is Qt.LeftButton:
-      if not isinstance(item, Tile):
-        coord = self.sceneToGrid(pos)
-        self.placeTile(Tile(self.pix, self.editArea), coord)
-        print(f'Placed tile at {coord!s}')
-      else:
-        event.ignore()
-        return
+      self.handleLeftButton(pos)
     elif event.button() is Qt.RightButton:
-      if isinstance(item, Tile):
-        print(f'Removed tile at {self.sceneToGrid(pos)!s}')
-        self.removeItem(item)
-      else:
-        event.ignore()
-        return
+      self.handleRightButton(pos)
     event.accept()
 
 
@@ -400,19 +436,9 @@ class Editor(QGraphicsScene):
         return
 
       if event.buttons() & Qt.LeftButton:
-        if not isinstance(item, Tile):
-          self.placeTile(Tile(self.pix, self.editArea), tilePos)
-          print(f'Placed tile at {tilePos!s}')
-        else:
-          event.ignore()
-          return
+        self.handleLeftButton(pos)
       elif event.buttons() & Qt.RightButton:
-        if isinstance(item, Tile):
-          self.removeItem(item)
-          print(f'Removed tile at {self.sceneToGrid(pos)!s}')
-        else:
-          event.ignore()
-          return
+        self.handleRightButton(pos)
     else:
       event.ignore()
     event.accept()

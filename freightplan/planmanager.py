@@ -23,6 +23,7 @@ coordinates UI state with document/file state.
 from PySide2.QtCore import QObject, Signal, Slot
 from PySide2.QtWidgets import QTabWidget
 
+import freightplan.components as Components
 from freightplan.plan import Plan
 from freightplan.gui import Editor
 
@@ -50,7 +51,16 @@ class PlanManager(QObject):
   def currentEditor(self) -> Editor:
     """Return the Editor in the active tab."""
 
+    # FIXME: check if -1 (no tabs)
     return self.tabPane.widget(self.tabPane.currentIndex()).scene()
+
+
+  @Slot(Components.ComponentID)
+  def setCurrentEditorTileBrush(self, cid: Components.ComponentID):
+    """Set the tile brush for the current Editor."""
+
+    component = Components.componentByID(cid)
+    self.currentEditor().setTileBrush(component.icon().pixmap(32, 32))
 
 
   @Slot()

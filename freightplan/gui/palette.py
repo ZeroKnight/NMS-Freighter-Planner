@@ -21,12 +21,13 @@ within a freighter. Each displayed component is a selectable "swatch" that
 determines what tile is placed on the grid.
 """
 
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Signal, Slot, QObject
 from PySide2.QtGui import QIcon, QPixmap
 from PySide2.QtWidgets import (
   QDockWidget, QFrame, QGridLayout, QLabel, QPushButton, QVBoxLayout
 )
 
+import freightplan.components as Components
 import freightplan.gui.iconmanager as IconManager
 
 def _addToGridLayout(widgets: list, grid: QGridLayout, columns: int):
@@ -46,6 +47,7 @@ def _addToGridLayout(widgets: list, grid: QGridLayout, columns: int):
       row += 1
       col = 0
 
+
 # TBD: Design of the palette
 # Simple grid layout with every component, analogous to a color palette? (meh)
 # Ideally grouped in some way: sections or as cascading buttons
@@ -56,6 +58,8 @@ def _addToGridLayout(widgets: list, grid: QGridLayout, columns: int):
 class Palette(QDockWidget):
   """Frame containing the freighter components palette."""
 
+  componentSelected = Signal(type(Components.ComponentID))
+
   def __init__(self, parent=None):
     """Constructor.
 
@@ -64,25 +68,18 @@ class Palette(QDockWidget):
 
     super().__init__('Components', parent)
 
-    # TEMP: Kludge until QTranslate is implemented
-    nameMap = {
-      'corridor': 'Straight Corridor',
-      'corridor-curved': 'Curved Corridor',
-      'junction': 'T-Junction',
-      'junction-cross': 'Cross Junction',
-      'room-large': 'Large Room',
-      'room-fleet': 'Fleet Command Room',
-    }
-
     self.frame = QFrame(self)
     # self.frame.setFrameStyle(QFrame.Panel | QFrame.Plain)
     self.setWidget(self.frame)
     self.layout = QVBoxLayout(self.frame)
 
     self.buttons = {}
-    for name, icon in IconManager.componentIcons().items():
-      self.buttons[name] = QPushButton(icon, '', self.frame)
-      self.buttons[name].setToolTip(nameMap[name])
+    for component in Components.componentList():
+      button = QPushButton(component.icon(), '', self.frame)
+      button.setToolTip(component.name())
+      button.setProperty('cid', component.cid())
+      button.clicked.connect(self._buttonHandler)
+      self.buttons[component.cid().name] = button
 
     self.layout.addWidget(QLabel('Corridors'))
     self.buttongrid = QGridLayout()
@@ -92,5 +89,9 @@ class Palette(QDockWidget):
 
 
   @Slot()
-  def foo(self):
-    pass
+  def _buttonHandler(self):
+    """Intermediary function to feed the componentSelected signal the
+    button's associated ComponentID.
+    """
+
+    self.componentSelected.emit(self.sender().property('cid'))

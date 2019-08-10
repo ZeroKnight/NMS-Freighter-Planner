@@ -1,10 +1,11 @@
 <!DOCTYPE RCC><RCC version="1.0">
-  <qresource prefix="/images">
-    <file alias="corridor">resources/corridor.png</file>
-    <file alias="corridor-curved">resources/corridor-curved.png</file>
-    <file alias="junction">resources/junction.png</file>
-    <file alias="junction-cross">resources/junction-cross.png</file>
-    <file alias="room-large">resources/room-large.png</file>
-    <file alias="room-fleet">resources/room-fleet.png</file>
+  <qresource prefix="/images/components">
+    <file alias="CorridorStraight">resources/corridor.png</file>
+    <file alias="CorridorCurved">resources/corridor-curved.png</file>
+    <file alias="Junction">resources/junction.png</file>
+    <file alias="JunctionCross">resources/junction-cross.png</file>
+    <file alias="RoomLarge">resources/room-large.png</file>
+    <file alias="RoomFleet">resources/room-fleet.png</file>
+    <file alias="Stairs">resources/stairs.png</file>
   </qresource>
 </RCC>

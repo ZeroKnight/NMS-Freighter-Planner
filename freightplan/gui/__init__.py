@@ -16,7 +16,7 @@
 
 """Application GUI classes. Subclassed from Qt classes."""
 
-from .editor  import Editor
+from .editor  import Editor, EditorGrid, EditorView
 from .palette import Palette
 from .sidebar import Sidebar
 from .tile    import Tile

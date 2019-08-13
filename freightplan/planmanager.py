@@ -55,7 +55,7 @@ class PlanManager(QObject):
     if currentIndex == -1:
       return None
     else:
-      return self.tabPane.widget(currentIndex).scene()
+      return self.tabPane.widget(currentIndex).editor()
 
 
   @Slot(Components.ComponentID)

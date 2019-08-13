@@ -86,6 +86,8 @@ class EditorView(QGraphicsView):
   Editor.
   """
 
+  editor = QGraphicsView.scene  # Friendly alias
+
   zoomChanged = Signal(float)
 
   def __init__(self, editor: 'Editor'):
@@ -180,7 +182,7 @@ class EditorView(QGraphicsView):
 
     # TODO: make configurable via Property
     margin = QSize(10, 10) # Between edge of grid and viewport
-    editAreaRect = self.scene().editArea.rect()
+    editAreaRect = self.editor().editArea.rect()
     editAreaSize = editAreaRect.size().toSize()
 
     # Make the scene 2x larger than the viewport, minus the editing grid. This

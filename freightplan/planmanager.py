@@ -25,7 +25,7 @@ from PySide2.QtWidgets import QTabWidget
 
 import freightplan.components as Components
 from freightplan.plan import Plan
-from freightplan.gui import Editor
+from freightplan.gui import Editor, EditorView
 
 class PlanManager(QObject):
   """Manages and coordinates Plans and their state with the UI state."""
@@ -56,6 +56,18 @@ class PlanManager(QObject):
       return None
     else:
       return self.tabPane.widget(currentIndex).editor()
+
+
+  def viewAt(self, index) -> EditorView:
+    """Return the EditorView in the tab at the specified index."""
+
+    return self.tabPane.widget(index)
+
+
+  def editorAt(self, index: int) -> Editor:
+    """Return the Editor in the tab at the specified index."""
+
+    return self.viewAt(index).editor()
 
 
   @Slot(Components.ComponentID)

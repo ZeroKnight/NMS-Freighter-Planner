@@ -51,16 +51,21 @@ class PlanManager(QObject):
   def currentEditor(self) -> Editor:
     """Return the Editor in the active tab."""
 
-    # FIXME: check if -1 (no tabs)
-    return self.tabPane.widget(self.tabPane.currentIndex()).scene()
+    currentIndex = self.tabPane.currentIndex()
+    if currentIndex == -1:
+      return None
+    else:
+      return self.tabPane.widget(currentIndex).scene()
 
 
   @Slot(Components.ComponentID)
   def setCurrentEditorTileBrush(self, cid: Components.ComponentID):
     """Set the tile brush for the current Editor."""
 
-    component = Components.componentByID(cid)
-    self.currentEditor().setTileBrush(component.icon().pixmap(32, 32))
+    currentEditor = self.currentEditor()
+    if currentEditor:
+      component = Components.componentByID(cid)
+      currentEditor.setTileBrush(component.icon().pixmap(32, 32))
 
 
   @Slot()

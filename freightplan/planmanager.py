@@ -79,7 +79,6 @@ class PlanManager(QObject):
     """Maintain a short history of previously active tabs."""
 
     self._tabHistory = [*self._tabHistory[1:], index]
-    pass
 
 
   def lastTab(self) -> int:

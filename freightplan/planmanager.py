@@ -166,6 +166,9 @@ class PlanManager(QObject):
 
     index = self.tabPane.currentIndex()
     plan = self._plans[index]
+    if index == -1:
+      return
+
     self.planClosing.emit(plan)
     if plan.modified():
       # prompt to save

@@ -47,7 +47,6 @@ class PlanManager(QObject):
     self.parent = parent
     self.tabPane = QTabWidget(parent)
     self._tabHistory = [-1] * TAB_HISTORY_SIZE
-    self._plans = {}
     self._newPlanCount = 1
 
     self.tabPane.currentChanged.connect(self.handleLastTab)
@@ -112,7 +111,6 @@ class PlanManager(QObject):
     editor = Editor(plan, self)
     self._newPlanCount += 1
     index = self.tabPane.addTab(editor.view, plan.name())
-    self._plans[index] = plan
     self.tabPane.setTabToolTip(index, plan.absoluteFilePath())
     self.planCreated.emit(plan)
 
@@ -127,7 +125,6 @@ class PlanManager(QObject):
       raise TypeError('filename cannot be empty or None')
 
     plan = Plan(filename)
-    self._plans.append(plan)
     self.planOpened.emit(plan)
 
 
@@ -136,7 +133,7 @@ class PlanManager(QObject):
     """Save the plan in the current tab."""
 
     index = self.tabPane.currentIndex()
-    plan = self._plans[index]
+    plan = self.editorAt(index).plan
     if not plan.modified():
       return
 
@@ -150,14 +147,11 @@ class PlanManager(QObject):
     """Save the specified Plan as another file name."""
 
     index = self.tabPane.currentIndex()
-    plan = self._plans[index]
     filename = ''  # TODO: save as dialog
     newPlan = Plan(filename)
     # copy plan data to newPlan
     # ensure newPlan.modified() returns true
     self.savePlan(newPlan)
-    self._plans.remove(plan)
-    self._plans.append(newPlan)
 
 
   @Slot()
@@ -165,10 +159,10 @@ class PlanManager(QObject):
     """Close the Plan in the current tab and remove it from the manager."""
 
     index = self.tabPane.currentIndex()
-    plan = self._plans[index]
     if index == -1:
       return
 
+    plan = self.editorAt(index).plan
     self.planClosing.emit(plan)
     if plan.modified():
       # prompt to save
@@ -176,4 +170,3 @@ class PlanManager(QObject):
 
     self._tabHistory[-1] = -1
     self.tabPane.removeTab(index)
-    del self._plans[index]

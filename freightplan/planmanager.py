@@ -117,13 +117,11 @@ class PlanManager(QObject):
     self.planCreated.emit(plan)
 
 
-  @Slot(str)
-  def openPlan(self, filename: str):
-    """Open an existing Plan and add it to the manager.
+  @Slot()
+  def openPlan(self):
+    """Open an existing Plan and add it to the manager."""
 
-    Args:
-      filename: The name of the Plan to open.
-    """
+    filename = ''  # TODO: open file dialog
 
     if not filename:
       raise TypeError('filename cannot be empty or None')
@@ -133,14 +131,12 @@ class PlanManager(QObject):
     self.planOpened.emit(plan)
 
 
-  @Slot(Plan)
-  def savePlan(self, plan: Plan):
-    """Save the specified Plan.
+  @Slot()
+  def savePlan(self):
+    """Save the plan in the current tab."""
 
-    Args:
-      plan: The Plan to save.
-    """
-
+    index = self.tabPane.currentIndex()
+    plan = self._plans[index]
     if not plan.modified():
       return
 
@@ -149,15 +145,13 @@ class PlanManager(QObject):
     self.planSaved.emit(plan)
 
 
-  @Slot(Plan, str)
-  def savePlanAs(self, plan: Plan, filename: str):
-    """Save the specified Plan as the given file name.
+  @Slot()
+  def savePlanAs(self):
+    """Save the specified Plan as another file name."""
 
-    Args:
-      plan: The Plan to save.
-      filename: The name of the file to save the Plan as.
-    """
-
+    index = self.tabPane.currentIndex()
+    plan = self._plans[index]
+    filename = ''  # TODO: save as dialog
     newPlan = Plan(filename)
     # copy plan data to newPlan
     # ensure newPlan.modified() returns true

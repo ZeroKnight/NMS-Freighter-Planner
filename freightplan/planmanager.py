@@ -47,7 +47,7 @@ class PlanManager(QObject):
     self.parent = parent
     self.tabPane = QTabWidget(parent)
     self._tabHistory = [-1] * TAB_HISTORY_SIZE
-    self._plans = []
+    self._plans = {}
     self._newPlanCount = 1
 
     self.tabPane.currentChanged.connect(self.handleLastTab)
@@ -111,8 +111,8 @@ class PlanManager(QObject):
     plan = Plan(f'New Plan {self._newPlanCount}')
     editor = Editor(plan, self)
     self._newPlanCount += 1
-    self._plans.append(plan)
     index = self.tabPane.addTab(editor.view, plan.name())
+    self._plans[index] = plan
     self.tabPane.setTabToolTip(index, plan.absoluteFilePath())
     self.planCreated.emit(plan)
 

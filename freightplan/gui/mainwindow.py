@@ -19,7 +19,7 @@
 
 import platform
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot, Qt
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QMainWindow, QAction, QMessageBox
 
@@ -42,6 +42,7 @@ class MainWindow(QMainWindow):
     self.resize(640, 480) # TEMP
 
     self.manager = PlanManager(self)
+    self.manager.tabPane.currentChanged.connect(self.setActivePlan)
     self.setCentralWidget(self.manager.tabPane)
 
     self.sidebar = Sidebar(self)
@@ -129,7 +130,6 @@ class MainWindow(QMainWindow):
     self.action['grid_show'].setChecked(True)
     self.action['grid_show'].setShortcut(Qt.CTRL + Qt.Key_G)
     self.action['grid_show'].setStatusTip('Toggle display of the editor grid')
-    # self.action['grid_show'].triggered.connect(self.editor.grid.setVisible)
 
     # TODO: Make a single-window About page with Qt info in a separate pane/tab
     # like other applications
@@ -179,6 +179,28 @@ class MainWindow(QMainWindow):
     menu_help = self.menubar.addMenu('&Help')
     menu_help.addAction(self.action['about'])
     menu_help.addAction(self.action['about_qt'])
+
+
+  @Slot(int)
+  def setActivePlan(self, tabIndex: int):
+    """Sets the active plan; the plan that the Editor controls will affect.
+
+    Handles reconnecting appropriate signals to the active Editor,
+    synchronizing UI state, etc.
+
+    Args:
+      tabIndex: The index of the tab containing the plan to activate.
+    """
+
+    lastTab = self.manager.lastTab()
+    gridShow = self.action['grid_show']
+    if lastTab != -1:
+      prevEditor = self.manager.editorAt(lastTab)
+      gridShow.triggered.disconnect(prevEditor.grid.setVisible)
+    editor = self.manager.editorAt(tabIndex)
+    gridShow.triggered.connect(editor.grid.setVisible)
+    gridShow.setChecked(editor.grid.isVisible())
+
 
 
   # TODO: Do everything needed to close gracefully, e.g.

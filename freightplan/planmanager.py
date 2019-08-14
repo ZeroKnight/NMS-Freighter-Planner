@@ -27,6 +27,8 @@ import freightplan.components as Components
 from freightplan.plan import Plan
 from freightplan.gui import Editor, EditorView
 
+TAB_HISTORY_SIZE = 5
+
 class PlanManager(QObject):
   """Manages and coordinates Plans and their state with the UI state."""
 
@@ -44,8 +46,11 @@ class PlanManager(QObject):
 
     self.parent = parent
     self.tabPane = QTabWidget(parent)
+    self._tabHistory = [-1] * TAB_HISTORY_SIZE
     self._plans = []
     self._newPlanCount = 1
+
+    self.tabPane.currentChanged.connect(self.handleLastTab)
 
 
   def currentEditor(self) -> Editor:
@@ -68,6 +73,22 @@ class PlanManager(QObject):
     """Return the Editor in the tab at the specified index."""
 
     return self.viewAt(index).editor()
+
+
+  def handleLastTab(self, index: int):
+    """Maintain a short history of previously active tabs."""
+
+    self._tabHistory = [*self._tabHistory[1:], index]
+    pass
+
+
+  def lastTab(self) -> int:
+    """Return the index of the last active tab."""
+
+    try:
+      return self._tabHistory[-2]
+    except:
+      return -1
 
 
   @Slot(Components.ComponentID)

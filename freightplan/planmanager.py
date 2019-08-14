@@ -166,17 +166,17 @@ class PlanManager(QObject):
     self._plans.append(newPlan)
 
 
-  @Slot(Plan)
-  def closePlan(self, plan: Plan):
-    """Close the specified Plan and remove it from the manager.
+  @Slot()
+  def closePlan(self):
+    """Close the Plan in the current tab and remove it from the manager."""
 
-    Args:
-      plan: The Plan to close.
-    """
-
+    index = self.tabPane.currentIndex()
+    plan = self._plans[index]
     self.planClosing.emit(plan)
     if plan.modified():
       # prompt to save
       pass
 
-    self._plans.remove(plan)
+    self._tabHistory[-1] = -1
+    self.tabPane.removeTab(index)
+    del self._plans[index]

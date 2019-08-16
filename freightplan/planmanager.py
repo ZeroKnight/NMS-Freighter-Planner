@@ -71,7 +71,8 @@ class PlanManager(QObject):
   def editorAt(self, index: int) -> Editor:
     """Return the Editor in the tab at the specified index."""
 
-    return self.viewAt(index).editor()
+    view = self.viewAt(index)
+    return view.editor() if view else None
 
 
   def handleLastTab(self, index: int):

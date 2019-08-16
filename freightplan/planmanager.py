@@ -85,7 +85,7 @@ class PlanManager(QObject):
 
     try:
       return self._tabHistory[-2]
-    except:
+    except IndexError:
       return -1
 
 

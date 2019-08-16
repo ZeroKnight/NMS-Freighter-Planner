@@ -60,6 +60,7 @@ class EditorGrid(QGraphicsObject):
     self._pen.setStyle(self._style)
 
     self.setOpacity(self._opacity)
+    self.setAcceptedMouseButtons(Qt.NoButton)
 
 
   @Slot(bool)

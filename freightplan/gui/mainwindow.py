@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: docstring
-"""Main Application Window ..."""
+"""mainwindow.py
+
+Main application window. Coalesces all parts of the GUI and program logic.
+Handles setting up most signal/slot connections, defining the program Actions
+and so on.
+"""
 
 import platform
 
@@ -29,10 +33,12 @@ from freightplan.planmanager import PlanManager
 from freightplan.gui import Editor, Palette, Sidebar
 
 class MainWindow(QMainWindow):
-  """blah"""
+  """Main application window for freightplan.
+
+  Bridges GUI and program logic and handles most signal/slot connections."""
 
   def __init__(self):
-    """blah"""
+    """Constructor."""
 
     super().__init__()
 

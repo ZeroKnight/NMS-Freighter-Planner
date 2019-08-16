@@ -197,10 +197,13 @@ class MainWindow(QMainWindow):
     if lastTab != -1:
       prevEditor = self.manager.editorAt(lastTab)
       gridShow.triggered.disconnect(prevEditor.grid.setVisible)
-    editor = self.manager.editorAt(tabIndex)
-    gridShow.triggered.connect(editor.grid.setVisible)
-    gridShow.setChecked(editor.grid.isVisible())
-
+    if self.manager.tabPane.count():
+      editor = self.manager.editorAt(tabIndex)
+      gridShow.triggered.connect(editor.grid.setVisible)
+      gridShow.setChecked(editor.grid.isVisible())
+      self.palette.setEnabled(True)
+    else:
+      self.palette.setDisabled(True)
 
 
   # TODO: Do everything needed to close gracefully, e.g.

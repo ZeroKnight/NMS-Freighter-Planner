@@ -67,6 +67,7 @@ class Palette(QDockWidget):
       parent: The parent widget this Palette belongs to."""
 
     super().__init__('Components', parent)
+    self.setDisabled(True)
 
     self.frame = QFrame(self)
     # self.frame.setFrameStyle(QFrame.Panel | QFrame.Plain)

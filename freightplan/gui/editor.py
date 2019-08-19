@@ -249,8 +249,8 @@ class EditorView(QGraphicsView):
       hBar.setValue(hBar.value() + delta.x())
       vBar.setValue(vBar.value() + delta.y())
       self._lastMousePos = event.pos()
-    else:
-      super().mouseMoveEvent(event)
+
+    super().mouseMoveEvent(event)
 
 
   def mousePressEvent(self, event):
@@ -263,8 +263,8 @@ class EditorView(QGraphicsView):
     if event.button() == Qt.MiddleButton:
       self._lastMousePos = event.pos()
       QtWidgets.QApplication.setOverrideCursor(Qt.ClosedHandCursor)
-    else:
-      super().mousePressEvent(event)
+
+    super().mousePressEvent(event)
 
 
   def mouseReleaseEvent(self, event):
@@ -275,8 +275,8 @@ class EditorView(QGraphicsView):
 
     if event.button() == Qt.MiddleButton:
       QtWidgets.QApplication.restoreOverrideCursor()
-    else:
-      super().mouseReleaseEvent(event)
+
+    super().mouseReleaseEvent(event)
 
 
 class Editor(QGraphicsScene):
@@ -409,15 +409,13 @@ class Editor(QGraphicsScene):
     """
 
     pos = event.buttonDownScenePos(event.button())
-    if not self.validGridPos(pos):
-      event.ignore()
-      return
+    if self.validGridPos(pos):
+      if event.button() is Qt.LeftButton:
+        self.handleLeftButton(pos)
+      elif event.button() is Qt.RightButton:
+        self.handleRightButton(pos)
 
-    if event.button() is Qt.LeftButton:
-      self.handleLeftButton(pos)
-    elif event.button() is Qt.RightButton:
-      self.handleRightButton(pos)
-    event.accept()
+    super().mouseMoveEvent(event)
 
 
   def mouseMoveEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
@@ -433,15 +431,10 @@ class Editor(QGraphicsScene):
 
     if tilePos != self.lastTilePos:
       self.lastTilePos = tilePos
+      if self.validGridPos(pos):
+        if event.buttons() & Qt.LeftButton:
+          self.handleLeftButton(pos)
+        elif event.buttons() & Qt.RightButton:
+          self.handleRightButton(pos)
 
-      if not self.validGridPos(pos):
-        event.ignore()
-        return
-
-      if event.buttons() & Qt.LeftButton:
-        self.handleLeftButton(pos)
-      elif event.buttons() & Qt.RightButton:
-        self.handleRightButton(pos)
-    else:
-      event.ignore()
-    event.accept()
+    super().mouseMoveEvent(event)

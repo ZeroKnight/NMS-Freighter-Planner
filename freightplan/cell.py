@@ -50,6 +50,12 @@ class Cell():
     return self._parent
 
 
+  def pos(self) -> QPoint:
+    """Return the cell's grid position as a QPoint."""
+
+    return QPoint(self._pos)
+
+
   def x(self) -> int:
     """Return the cell's X grid coordinate."""
 

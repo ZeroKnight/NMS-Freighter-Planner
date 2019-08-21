@@ -38,8 +38,6 @@ from freightplan import GRID_SIZE
 from freightplan.plan import Plan
 from freightplan.gui.tile import Tile
 
-cellSize = 32 # TEMP: keep this in Plan or something
-
 # TEMP
 import freightplan.gui.resources_rc
 
@@ -74,8 +72,8 @@ class EditorGrid(QGraphicsObject):
 
   def paint(self, painter, option, widget):
     painter.setPen(self._pen)
-    end = cellSize * GRID_SIZE
-    for n in range(cellSize, end, cellSize):
+    end = Plan.cellSize * GRID_SIZE
+    for n in range(Plan.cellSize, end, Plan.cellSize):
       painter.drawLine(n, 0, n, end)
       painter.drawLine(0, n, end, n)
 
@@ -303,7 +301,7 @@ class Editor(QGraphicsScene):
 
     self._tileBrush = None
 
-    length = cellSize * GRID_SIZE
+    length = Plan.cellSize * GRID_SIZE
 
     # Create border for grid area
     borderRect = QRectF(0, 0, length, length)
@@ -325,16 +323,22 @@ class Editor(QGraphicsScene):
     self._tileBrush = pixmap
 
 
+  def currentFloor(self) -> 'Floor':
+    """Return the currently active Floor object."""
+
+    return self.plan.floorAt(self._currentFloor)
+
+
   def sceneToGrid(self, pos: QPointF) -> QPoint:
     """Map a scene position to grid coordinates."""
 
-    return QPoint(pos.x() // cellSize, pos.y() // cellSize)
+    return QPoint(pos.x() // Plan.cellSize, pos.y() // Plan.cellSize)
 
 
   def gridToScene(self, pos: QPoint) -> QPointF:
     """Map grid coordinates to a scene position."""
 
-    return QPointF(pos.x() * cellSize, pos.y() * cellSize)
+    return QPointF(pos.x() * Plan.cellSize, pos.y() * Plan.cellSize)
 
 
   def validGridPos(self, pos: QPointF) -> bool:

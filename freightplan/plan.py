@@ -26,8 +26,7 @@ from freightplan.floor import Floor
 class Plan(Document):
   """A freighter plan. The typical "document" in freightplan."""
 
-  # list or set containing the layers of the plan. Must be limited to 14, and the
-  # first layer is special in that it has 3 unmodifiable spaces
+  cellSize = 32
 
   # TODO: parameters
   def __init__(self, filename: str=None):

@@ -21,29 +21,21 @@ object. Consists of a pixmap to visually represent a component.
 """
 
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QGraphicsPixmapItem
+from PySide2.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
 class Tile(QGraphicsPixmapItem):
-  """Represents a placed component on the Editor grid.
+  """Represents a placed component on the Editor grid."""
 
-  Consists of a pixmap item whose parent is the grid cell QRect it was placed
-  in. Its bounding rectangle is set to match the parent grid cell.
-  """
-
-  def __init__(self, pixmap: QPixmap, parent: 'CellItem'):
+  def __init__(self, pixmap: QPixmap, parent: QGraphicsItem):
     """Constructor.
-
-    Initializes a QGraphicsPixmapItem and set its positon to its parent.
 
     Args:
       pixmap: The QPixmap to display for the tile.
-      parent: The QGraphicsRectItem that this tile is a child of.
+      parent: The QGraphicsItem that this tile is a child of.
     """
 
     super().__init__(pixmap, parent)
 
     # Ensure the shape consists of the whole pixmap and not just the opaque
-    # portion, otherwise the background rect would be selected.
+    # portion to ensure we select the Tile.
     self.setShapeMode(QGraphicsPixmapItem.BoundingRectShape)
-
-    # self.setPos(self.parentItem().rect().topLeft())

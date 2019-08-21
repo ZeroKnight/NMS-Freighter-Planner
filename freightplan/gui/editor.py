@@ -300,6 +300,7 @@ class Editor(QGraphicsScene):
     self.setBackgroundBrush(QBrush(Qt.lightGray))
 
     self._tileBrush = None
+    self._currentFloor = 0
 
     length = Plan.cellSize * GRID_SIZE
 
@@ -358,6 +359,8 @@ class Editor(QGraphicsScene):
     """
 
     if self.validGridPos(pos):
+      floor = self.currentFloor()
+      floor.cellAt(pos).setTile(tile)
       tile.setVisible(True)
       scenePos = self.gridToScene(pos)
       tile.setPos(scenePos)
@@ -375,6 +378,8 @@ class Editor(QGraphicsScene):
     """
 
     if self.validGridPos(pos):
+      floor = self.currentFloor()
+      floor.cellAt(pos).clearTile()
       scenePos = self.gridToScene(pos)
       self.removeItem(self.itemAt(scenePos, QTransform()))
       print(f'Removed tile at {pos!s}')

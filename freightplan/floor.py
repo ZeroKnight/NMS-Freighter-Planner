@@ -147,6 +147,11 @@ class Floor(IdMixin):
     self._grid = []
     self._sectors = {}
 
+    for y in range(GRID_SIZE):
+      for x in range(GRID_SIZE):
+        cellPos = QPoint(x, y)
+        self._grid.append(Cell(cellPos, self._grid))
+
 
   def name(self) -> str:
     """Return the floor name."""

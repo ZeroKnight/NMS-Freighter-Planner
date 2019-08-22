@@ -29,18 +29,16 @@ from freightplan.gui.tile import Tile
 class Cell():
   """A single grid cell. Can contain a Tile."""
 
-  def __init__(self, pos: QPoint, parent, size: int=32):
+  def __init__(self, pos: QPoint, parent):
     """Constructor.
 
     Args:
       pos: The position of this cell on the grid as a QPoint.
       parent: The grid that this cell belongs to.
-      size: The size of this cell in pixels. Defaults to 32px.
     """
 
     self._parent = parent
     self._pos = pos
-    self._rect = QRect(pos.x(), pos.y(), size, size)
     self._tile = None
 
 
@@ -66,12 +64,6 @@ class Cell():
     """Return the cell's Y grid coordinate."""
 
     return self._pos.y()
-
-
-  def size(self) -> int:
-    """Return the cell's size."""
-
-    return self._rect.height()
 
 
   def tile(self) -> Tile:

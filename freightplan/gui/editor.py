@@ -359,8 +359,7 @@ class Editor(QGraphicsScene):
     """
 
     if self.validGridPos(pos):
-      floor = self.currentFloor()
-      floor.cellAt(pos).setTile(tile)
+      self.currentFloor().cellAt(pos).setTile(tile)
       tile.setVisible(True)
       scenePos = self.gridToScene(pos)
       tile.setPos(scenePos)
@@ -378,10 +377,9 @@ class Editor(QGraphicsScene):
     """
 
     if self.validGridPos(pos):
-      floor = self.currentFloor()
-      floor.cellAt(pos).clearTile()
-      scenePos = self.gridToScene(pos)
-      self.removeItem(self.itemAt(scenePos, QTransform()))
+      cell = self.currentFloor().cellAt(pos)
+      self.removeItem(cell.tile())
+      cell.clearTile()
       print(f'Removed tile at {pos!s}')
     else:
       raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')

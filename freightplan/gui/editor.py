@@ -300,6 +300,7 @@ class Editor(QGraphicsScene):
     self.setBackgroundBrush(QBrush(Qt.lightGray))
 
     self._tileBrush = None
+    self._tileRotation = 0
     self._currentFloor = 0
 
     length = Plan.cellSize * GRID_SIZE
@@ -322,6 +323,7 @@ class Editor(QGraphicsScene):
     """
 
     self._tileBrush = pixmap
+    self._tileRotation = 0
 
 
   def currentFloor(self) -> 'Floor':
@@ -375,6 +377,7 @@ class Editor(QGraphicsScene):
     if self.validGridPos(pos):
       self.currentFloor().cellAt(pos).setTile(tile)
       tile.setVisible(True)
+      tile.setRotation(self._tileRotation)
       scenePos = self.gridToScene(pos)
       tile.setPos(scenePos)
       print(f'Placed tile at {pos!s}')
@@ -405,6 +408,7 @@ class Editor(QGraphicsScene):
     coord = self.sceneToGrid(pos)
     item = self.itemAtGridPos(coord, QTransform())
     if isinstance(item, Tile):
+      # TODO: Handle different rotations
       if item.pixmap().cacheKey() != self._tileBrush.cacheKey():
         self.removeTile(coord)
       else:
@@ -460,3 +464,16 @@ class Editor(QGraphicsScene):
           self.handleRightButton(pos)
 
     super().mouseMoveEvent(event)
+
+
+  def keyPressEvent(self, event):
+    """Implementation."""
+
+    if event.key() == Qt.Key_R:
+      if event.modifiers() & Qt.ShiftModifier:
+        self._tileRotation -= 90
+      else:
+        self._tileRotation += 90
+      self._tileRotation %= 360
+
+    super().keyPressEvent(event)

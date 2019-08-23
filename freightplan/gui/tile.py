@@ -20,7 +20,7 @@ Represents a placed component on the Editor grid, contained within a Cell
 object. Consists of a pixmap to visually represent a component.
 """
 
-from PySide2.QtGui import QPixmap
+from PySide2.QtGui import QPixmap, QTransform
 from PySide2.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
 class Tile(QGraphicsPixmapItem):
@@ -39,3 +39,31 @@ class Tile(QGraphicsPixmapItem):
     # Ensure the shape consists of the whole pixmap and not just the opaque
     # portion to ensure we select the Tile.
     self.setShapeMode(QGraphicsPixmapItem.BoundingRectShape)
+
+    self.setTransformOriginPoint(self.boundingRect().center())
+
+
+  def rotateRight(self):
+    """Rotates the tile 90 degrees to the right."""
+
+    self.setRotation(self.rotation() + 90)
+
+
+  def rotateLeft(self):
+    """Rotates the tile 90 degrees to the left."""
+
+    self.setRotation(self.rotation() - 90)
+
+
+  def flipHorizontally(self):
+    """Flips the tile horizontally; that is, over its vertical axis."""
+
+    flipped = QTransform.fromScale(self.scale() * -1, self.scale())
+    self.setTransform(flipped)
+
+
+  def flipVertically(self):
+    """Flips the tile vertically; that is, over its horizontal axis."""
+
+    flipped = QTransform.fromScale(self.scale(), self.scale() * -1)
+    self.setTransform(flipped)

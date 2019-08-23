@@ -419,6 +419,7 @@ class Editor(QGraphicsScene):
 
     pos = event.buttonDownScenePos(event.button())
     if self.validGridPos(pos):
+      self.lastTilePos = self.sceneToGrid(pos)
       if event.button() is Qt.LeftButton:
         self.handleLeftButton(pos)
       elif event.button() is Qt.RightButton:

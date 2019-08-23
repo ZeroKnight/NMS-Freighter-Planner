@@ -349,6 +349,20 @@ class Editor(QGraphicsScene):
     return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
 
 
+  def itemAtGridPos(self, pos: QPoint, transform: QTransform) -> QGraphicsItem:
+    """Return the QGraphicsItem at the specified grid coordinate.
+
+    Functions similarly to the base itemAt() method."""
+
+    # Adjust the position to the center of the grid cell to ensure the item is
+    # under the cursor. Items with even dimensions have a sub-pixel center,
+    # causing it to be shifted one pixel when rotating.
+    center = Plan.cellSize / 2
+    scenePos = self.gridToScene(pos) + QPointF(center, center)
+
+    return self.itemAt(scenePos, transform)
+
+
   def placeTile(self, tile: Tile, pos: QPoint):
     """Place a tile on the Editor.
 
@@ -388,8 +402,8 @@ class Editor(QGraphicsScene):
   def handleLeftButton(self, pos: QPointF):
     """Handles the left mouse button for the Editor area."""
 
-    item = self.itemAt(pos, QTransform())
     coord = self.sceneToGrid(pos)
+    item = self.itemAtGridPos(coord, QTransform())
     if isinstance(item, Tile):
       if item.pixmap().cacheKey() != self._tileBrush.cacheKey():
         self.removeTile(coord)
@@ -401,8 +415,8 @@ class Editor(QGraphicsScene):
   def handleRightButton(self, pos: QPointF):
     """Handles the right mouse button for the Editor area."""
 
-    item = self.itemAt(pos, QTransform())
     coord = self.sceneToGrid(pos)
+    item = self.itemAtGridPos(coord, QTransform())
     if isinstance(item, Tile):
       self.removeTile(coord)
 

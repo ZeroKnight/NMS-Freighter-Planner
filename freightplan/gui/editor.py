@@ -24,6 +24,8 @@ aide positioning and placement. EditorView is a subclass of a QGraphicsView
 that pairs with an Editor and displays it in the GUI.
 """
 
+from typing import Union
+
 import PySide2.QtGui as QtGui
 import PySide2.QtWidgets as QtWidgets
 from PySide2.QtCore import (
@@ -328,14 +330,18 @@ class Editor(QGraphicsScene):
 
     return QPointF(pos.x() * Plan.cellSize, pos.y() * Plan.cellSize)
 
-
   @staticmethod
-  def validGridPos(pos: QPointF) -> bool:
-    """Return whether the given scene position is within the grid."""
+  def validGridPos(pos: Union[QPointF, QPoint], scene: bool=False) -> bool:
+    """Return whether the given scene position is within the grid.
 
-    coord = __class__.sceneToGrid(pos)
+    Args:
+      pos: The position to validate. Can be either a QPointF or QPoint.
+      scene: If true, pos represents a scene coordinate, otherwise pos is a
+             grid coordinate. Defaults to false, i.e. a grid coordinate.
+    """
+
+    coord = __class__.sceneToGrid(pos) if scene else pos
     return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
-
 
   def setTileBrush(self, pixmap: QPixmap):
     """Set the tile to be placed when painting on the Editor.
@@ -437,7 +443,7 @@ class Editor(QGraphicsScene):
     """
 
     pos = event.buttonDownScenePos(event.button())
-    if self.validGridPos(pos):
+    if self.validGridPos(pos, scene=True):
       self.lastTilePos = self.sceneToGrid(pos)
       if event.button() is Qt.LeftButton:
         self.handleLeftButton(pos)
@@ -460,7 +466,7 @@ class Editor(QGraphicsScene):
 
     if tilePos != self.lastTilePos:
       self.lastTilePos = tilePos
-      if self.validGridPos(pos):
+      if self.validGridPos(tilePos):
         if event.buttons() & Qt.LeftButton:
           self.handleLeftButton(pos)
         elif event.buttons() & Qt.RightButton:

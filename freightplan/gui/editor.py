@@ -315,6 +315,28 @@ class Editor(QGraphicsScene):
     self.view.centerOn(borderRect.center())
 
 
+  @staticmethod
+  def sceneToGrid(pos: QPointF) -> QPoint:
+    """Map a scene position to grid coordinates."""
+
+    return QPoint(pos.x() // Plan.cellSize, pos.y() // Plan.cellSize)
+
+
+  @staticmethod
+  def gridToScene(pos: QPoint) -> QPointF:
+    """Map grid coordinates to a scene position."""
+
+    return QPointF(pos.x() * Plan.cellSize, pos.y() * Plan.cellSize)
+
+
+  @staticmethod
+  def validGridPos(pos: QPointF) -> bool:
+    """Return whether the given scene position is within the grid."""
+
+    coord = __class__.sceneToGrid(pos)
+    return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
+
+
   def setTileBrush(self, pixmap: QPixmap):
     """Set the tile to be placed when painting on the Editor.
 
@@ -330,25 +352,6 @@ class Editor(QGraphicsScene):
     """Return the currently active Floor object."""
 
     return self.plan.floorAt(self._currentFloor)
-
-
-  def sceneToGrid(self, pos: QPointF) -> QPoint:
-    """Map a scene position to grid coordinates."""
-
-    return QPoint(pos.x() // Plan.cellSize, pos.y() // Plan.cellSize)
-
-
-  def gridToScene(self, pos: QPoint) -> QPointF:
-    """Map grid coordinates to a scene position."""
-
-    return QPointF(pos.x() * Plan.cellSize, pos.y() * Plan.cellSize)
-
-
-  def validGridPos(self, pos: QPointF) -> bool:
-    """Return whether the given scene position is within the grid."""
-
-    coord = self.sceneToGrid(pos)
-    return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
 
 
   def itemAtGridPos(self, pos: QPoint, transform: QTransform) -> QGraphicsItem:

@@ -343,8 +343,14 @@ class EditArea(QGraphicsRectItem):
     super().paint(painter, option, widget)
     if self._hoveredCell:
       scenePos = Editor.gridToScene(self._hoveredCell)
-      # TODO: Use drawPixmapFragments() to apply rotation/flip
-      painter.drawPixmap(scenePos, self.editor._tileBrush)
+      pixmap = self.editor._tileBrush
+      fragment = QPainter.PixmapFragment.create(
+        scenePos + QPointF(pixmap.width() / 2, pixmap.height() / 2),
+        QRectF(QPointF(0, 0), pixmap.size()),
+        rotation=self.editor._tileRotation,
+        opacity=0.75
+      )
+      painter.drawPixmapFragments(fragment, 1, pixmap)
 
 
   def hoverMoveEvent(self, event):
@@ -574,5 +580,6 @@ class Editor(QGraphicsScene):
       else:
         self._tileRotation += 90
       self._tileRotation %= 360
+      self.editArea.update()
 
     super().keyPressEvent(event)

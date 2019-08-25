@@ -33,7 +33,8 @@ from PySide2.QtCore import (
 )
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap, QTransform
 from PySide2.QtWidgets import (
-  QGraphicsItem, QGraphicsObject, QGraphicsScene, QGraphicsView
+  QGraphicsItem, QGraphicsObject, QGraphicsRectItem, QGraphicsScene,
+  QGraphicsView
 )
 
 from freightplan import GRID_SIZE
@@ -108,6 +109,7 @@ class EditorView(QGraphicsView):
     ]
     self._currentScale = 1
 
+    self.setMouseTracking(True)
     self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
     self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
@@ -285,6 +287,91 @@ class EditorView(QGraphicsView):
     super().mouseReleaseEvent(event)
 
 
+class EditArea(QGraphicsRectItem):
+  """QGraphicsRectItem representing the editing area."""
+
+  def __init__(self, rect: QRectF, editor: 'Editor'):
+    """Constructor."""
+
+    super().__init__(rect)
+
+    self.editor = editor
+    self._hoveredCell = None
+    self.lastTilePos = None
+
+    self.setPen(QPen(Qt.gray))
+    self.setBrush(QBrush('#5e6787', Qt.SolidPattern))
+    self.setAcceptHoverEvents(True)
+    self.editor.addItem(self)
+
+    self.editor.view.panStarted.connect(self.unsetHoveredCell)
+    self.editor.view.panEnded.connect(self.setHoveredCell)
+
+
+  @Slot()
+  def unsetHoveredCell(self):
+    """Unsets the currently hovered cell."""
+
+    self._hoveredCell = None
+    self.update()
+
+
+  @Slot(QPointF)
+  def setHoveredCell(self, pos: Union[QPoint, QPointF]):
+    """Sets the currently hovered cell.
+
+    Args:
+      pos: If given as a QPoint, specifies the position of the cell in grid
+           coordinates. If given as a QPointF, specifies the position of the
+           cell in scene coordinates.
+    """
+
+    if isinstance(pos, QPointF):
+      pos = Editor.sceneToGrid(pos)
+
+    if Editor.validGridPos(pos):
+      self._hoveredCell = pos
+    else:
+      raise ValueError('Cannot set hovered cell to invalid position ({}, {})'
+                       .format(pos.x(), pos.y()))
+    self.update()
+
+
+  def paint(self, painter, option, widget):
+    """Implementation.
+
+    Handle drawing "ghost" tiles when hovering over grid cells.
+    """
+
+    super().paint(painter, option, widget)
+    if self._hoveredCell:
+      scenePos = Editor.gridToScene(self._hoveredCell)
+      # TODO: Use drawPixmapFragments() to apply rotation/flip
+      painter.drawPixmap(scenePos, self.editor._tileBrush)
+
+
+  def hoverMoveEvent(self, event):
+    """Implementation.
+
+    Keeps track of the cell the cursor is hovering over for other events to
+    make use of.
+    """
+
+    pos = Editor.sceneToGrid(event.pos())
+    if Editor.validGridPos(pos):
+      if pos != self.lastTilePos:
+        self.lastTilePos = pos
+        self.setHoveredCell(pos)
+    else:
+      self.unsetHoveredCell()
+
+
+  def hoverLeaveEvent(self, event):
+    """Implementation."""
+
+    self.unsetHoveredCell()
+
+
 class Editor(QGraphicsScene):
   """QGraphicsScene containing the editing area.
 
@@ -315,10 +402,7 @@ class Editor(QGraphicsScene):
 
     # Create border for grid area
     borderRect = QRectF(0, 0, length, length)
-    pen = QPen(Qt.gray)
-    brush = QBrush('#5e6787', Qt.SolidPattern)
-
-    self.editArea = self.addRect(borderRect, pen, brush)
+    self.editArea = EditArea(borderRect, self)
     self.grid = EditorGrid(self.editArea)
     self.view.centerOn(borderRect.center())
 

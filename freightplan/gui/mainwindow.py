@@ -203,11 +203,13 @@ class MainWindow(QMainWindow):
     if lastTab != -1:
       prevEditor = self.manager.editorAt(lastTab)
       gridShow.triggered.disconnect(prevEditor.grid.setVisible)
+      self.removeEventFilter(prevEditor)
     if self.manager.tabPane.count():
       editor = self.manager.editorAt(tabIndex)
       gridShow.triggered.connect(editor.grid.setVisible)
       gridShow.setChecked(editor.grid.isVisible())
       self.palette.setEnabled(True)
+      self.installEventFilter(editor)
     else:
       self.palette.setDisabled(True)
 

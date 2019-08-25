@@ -583,3 +583,17 @@ class Editor(QGraphicsScene):
       self.editArea.update()
 
     super().keyPressEvent(event)
+
+
+  def eventFilter(self, watched, event):
+    """Implementation.
+
+    Allows capturing key events for the editor even when the EditorView is
+    not currently focused.
+    """
+
+    if event.type() == QEvent.KeyPress:
+      if QApplication.focusObject() != self.view:
+        self.keyPressEvent(event)
+        return False
+    return super().eventFilter(watched, event)

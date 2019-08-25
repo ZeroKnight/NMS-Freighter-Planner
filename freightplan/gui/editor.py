@@ -29,12 +29,12 @@ from typing import Union
 import PySide2.QtGui as QtGui
 import PySide2.QtWidgets as QtWidgets
 from PySide2.QtCore import (
-  Signal, Slot, QObject, QPoint, QPointF, QRectF, QSize, Qt
+  Signal, Slot, QEvent, QObject, QPoint, QPointF, QRectF, QSize, Qt
 )
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap, QTransform
 from PySide2.QtWidgets import (
-  QGraphicsItem, QGraphicsObject, QGraphicsRectItem, QGraphicsScene,
-  QGraphicsView
+  QApplication, QGraphicsItem, QGraphicsObject, QGraphicsRectItem,
+  QGraphicsScene, QGraphicsView
 )
 
 from freightplan import GRID_SIZE
@@ -268,7 +268,7 @@ class EditorView(QGraphicsView):
     if event.button() == Qt.MiddleButton:
       self._lastMousePos = pos
       self.panStarted.emit(self.mapToScene(pos))
-      QtWidgets.QApplication.setOverrideCursor(Qt.ClosedHandCursor)
+      QApplication.setOverrideCursor(Qt.ClosedHandCursor)
 
     super().mousePressEvent(event)
 
@@ -281,7 +281,7 @@ class EditorView(QGraphicsView):
 
     pos = event.pos()
     if event.button() == Qt.MiddleButton:
-      QtWidgets.QApplication.restoreOverrideCursor()
+      QApplication.restoreOverrideCursor()
       self.panEnded.emit(self.mapToScene(pos))
 
     super().mouseReleaseEvent(event)

@@ -304,9 +304,6 @@ class EditArea(QGraphicsRectItem):
     self.setAcceptHoverEvents(True)
     self.editor.addItem(self)
 
-    self.editor.view.panStarted.connect(self.unsetHoveredCell)
-    self.editor.view.panEnded.connect(self.setHoveredCell)
-
 
   @Slot()
   def unsetHoveredCell(self):
@@ -400,11 +397,14 @@ class Editor(QGraphicsScene):
 
     length = Plan.cellSize * GRID_SIZE
 
-    # Create border for grid area
+    # Create editing area
     borderRect = QRectF(0, 0, length, length)
     self.editArea = EditArea(borderRect, self)
     self.grid = EditorGrid(self.editArea)
     self.view.centerOn(borderRect.center())
+
+    self.view.panStarted.connect(self.editArea.unsetHoveredCell)
+    self.view.panEnded.connect(self.editArea.setHoveredCell)
 
 
   @staticmethod

@@ -341,9 +341,9 @@ class EditArea(QGraphicsRectItem):
     """
 
     super().paint(painter, option, widget)
-    if self._hoveredCell:
+    pixmap = self.editor._tileBrush
+    if self._hoveredCell and pixmap:
       scenePos = Editor.gridToScene(self._hoveredCell)
-      pixmap = self.editor._tileBrush
       fragment = QPainter.PixmapFragment.create(
         scenePos + QPointF(pixmap.width() / 2, pixmap.height() / 2),
         QRectF(QPointF(0, 0), pixmap.size()),

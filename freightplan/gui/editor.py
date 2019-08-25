@@ -89,6 +89,8 @@ class EditorView(QGraphicsView):
 
   editor = QGraphicsView.scene  # Friendly alias
 
+  panStarted = Signal(QPointF)
+  panEnded = Signal(QPointF)
   zoomChanged = Signal(float)
 
   def __init__(self, editor: 'Editor'):
@@ -260,8 +262,10 @@ class EditorView(QGraphicsView):
     appropriate cursor.
     """
 
+    pos = event.pos()
     if event.button() == Qt.MiddleButton:
-      self._lastMousePos = event.pos()
+      self._lastMousePos = pos
+      self.panStarted.emit(self.mapToScene(pos))
       QtWidgets.QApplication.setOverrideCursor(Qt.ClosedHandCursor)
 
     super().mousePressEvent(event)
@@ -273,8 +277,10 @@ class EditorView(QGraphicsView):
     Restore the mouse cursor if we're done panning.
     """
 
+    pos = event.pos()
     if event.button() == Qt.MiddleButton:
       QtWidgets.QApplication.restoreOverrideCursor()
+      self.panEnded.emit(self.mapToScene(pos))
 
     super().mouseReleaseEvent(event)
 

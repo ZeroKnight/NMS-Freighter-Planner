@@ -426,6 +426,7 @@ class Editor(QGraphicsScene):
 
     return QPointF(pos.x() * Plan.cellSize, pos.y() * Plan.cellSize)
 
+
   @staticmethod
   def validGridPos(pos: Union[QPointF, QPoint], scene: bool=False) -> bool:
     """Return whether the given scene position is within the grid.
@@ -438,6 +439,7 @@ class Editor(QGraphicsScene):
 
     coord = __class__.sceneToGrid(pos) if scene else pos
     return 0 <= coord.x() < GRID_SIZE and 0 <= coord.y() < GRID_SIZE
+
 
   def setTileBrush(self, pixmap: QPixmap):
     """Set the tile to be placed when painting on the Editor.

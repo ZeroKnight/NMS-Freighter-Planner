@@ -211,5 +211,5 @@ class Tool(QObject):
     return False
 
 
-  def keyReleaseEven(self, event: QtGui.QKeyEvent):
+  def keyReleaseEvent(self, event: QtGui.QKeyEvent):
     return False

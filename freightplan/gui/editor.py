@@ -400,6 +400,7 @@ class Editor(QGraphicsScene):
     self._tileBrush = None
     self._tileRotation = 0
     self._currentFloor = 0
+    self._currentTool = None
 
     length = Plan.cellSize * GRID_SIZE
 
@@ -458,6 +459,12 @@ class Editor(QGraphicsScene):
     return self.plan.floorAt(self._currentFloor)
 
 
+  def currentTool(self) -> Tool:
+    """Return the currently active tool bound to this Editor."""
+
+    return self._currentTool
+
+
   def itemAtGridPos(self, pos: QPoint, transform: QTransform) -> QGraphicsItem:
     """Return the QGraphicsItem at the specified grid coordinate.
 
@@ -508,83 +515,12 @@ class Editor(QGraphicsScene):
     else:
       raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')
 
-
-  def handleLeftButton(self, pos: QPointF):
-    """Handles the left mouse button for the Editor area."""
-
-    coord = self.sceneToGrid(pos)
-    item = self.itemAtGridPos(coord, QTransform())
-    if isinstance(item, Tile):
-      # TODO: Handle different rotations
-      if item.pixmap().cacheKey() != self._tileBrush.cacheKey():
-        self.removeTile(coord)
-      else:
-        return
-    self.placeTile(Tile(self._tileBrush, self.editArea), coord)
-
-
-  def handleRightButton(self, pos: QPointF):
-    """Handles the right mouse button for the Editor area."""
-
-    coord = self.sceneToGrid(pos)
-    item = self.itemAtGridPos(coord, QTransform())
-    if isinstance(item, Tile):
-      self.removeTile(coord)
-
-
-  # TODO: Handle things like selection areas and middle-click scrolling
-  def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
-    """Implementation.
-
-    A left-click places a tile on a grid space, while a right-click removes a
-    tile.
-    """
-
-    pos = event.buttonDownScenePos(event.button())
-    if self.validGridPos(pos, scene=True):
-      self.lastTilePos = self.sceneToGrid(pos)
-      if event.button() is Qt.LeftButton:
-        self.handleLeftButton(pos)
-      elif event.button() is Qt.RightButton:
-        self.handleRightButton(pos)
-
-    super().mouseMoveEvent(event)
-
-
-  def mouseMoveEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
-    """Implementation.
-
-    Handles mouse movement events in the editor. Dragging the mouse with a
-    button pressed will place or remove all tiles passed over.
-    """
-
-    pos = event.scenePos()
-    tilePos = self.sceneToGrid(pos)
-    item = self.itemAt(pos, QTransform())
-
-    if tilePos != self.lastTilePos:
-      self.lastTilePos = tilePos
-      if self.validGridPos(tilePos):
-        if event.buttons() & Qt.LeftButton:
-          self.handleLeftButton(pos)
-        elif event.buttons() & Qt.RightButton:
-          self.handleRightButton(pos)
-
-    super().mouseMoveEvent(event)
-
-
-  def keyPressEvent(self, event):
-    """Implementation."""
-
-    if event.key() == Qt.Key_R:
-      if event.modifiers() & Qt.ShiftModifier:
-        self._tileRotation -= 90
-      else:
-        self._tileRotation += 90
-      self._tileRotation %= 360
-      self.editArea.update()
-
-    super().keyPressEvent(event)
+  # Pass events to the current tool first, as they typically handle most
+  # Editor events.
+  def event(self, event: QEvent):
+    accepted = QApplication.sendEvent(self.currentTool(), event)
+    if not accepted:
+      super().event(event)
 
 
   def eventFilter(self, watched, event):
@@ -596,6 +532,6 @@ class Editor(QGraphicsScene):
 
     if event.type() == QEvent.KeyPress:
       if QApplication.focusObject() != self.view:
-        self.keyPressEvent(event)
+        self.currentTool().keyPressEvent(event)
         return False
     return super().eventFilter(watched, event)

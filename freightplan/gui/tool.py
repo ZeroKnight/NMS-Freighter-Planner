@@ -47,7 +47,7 @@ class Tool(QObject):
     super().__init__(parent)
     self._name = name
     self._icon = icon
-    self._plan = None
+    self._editor = None
     self._active = False
     self._toolTip = None
     self._statusTip = None
@@ -80,16 +80,16 @@ class Tool(QObject):
     self._icon = icon
 
 
-  def plan(self) -> str:
-    """Return the Plan that the Tool is currently bound to."""
+  def editor(self) -> str:
+    """Return the Editor that the Tool is currently bound to."""
 
-    return self._plan
+    return self._editor
 
 
-  def setPlan(self, plan: QIcon):
-    """Set the Plan that the Tool is bound to."""
+  def setEditor(self, editor: QIcon):
+    """Set the Editor that the Tool is bound to."""
 
-    self._plan = plan
+    self._editor = editor
 
 
   def enabled(self) -> bool:
@@ -168,7 +168,7 @@ class Tool(QObject):
       _eventDict[et](event)
       return True
     else:
-      return super().event(event)
+      return False
 
 
   def mousePressEvent(self, event: QtGui.QMouseEvent):

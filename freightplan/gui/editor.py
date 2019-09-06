@@ -519,9 +519,11 @@ class Editor(QGraphicsScene):
   # Pass events to the current tool first, as they typically handle most
   # Editor events.
   def event(self, event: QEvent):
-    accepted = QApplication.sendEvent(self.currentTool(), event)
-    if not accepted:
-      super().event(event)
+    accepted = False
+    tool = self.currentTool()
+    if tool is not None:
+      accepted = QApplication.sendEvent(self.currentTool(), event)
+    return True if accepted else super().event(event)
 
 
   def eventFilter(self, watched, event):

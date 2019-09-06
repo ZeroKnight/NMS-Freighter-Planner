@@ -172,44 +172,44 @@ class Tool(QObject):
 
 
   def mousePressEvent(self, event: QtGui.QMouseEvent):
-    self.ignore()
+    event.ignore()
 
 
   def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
-    self.ignore()
+    event.ignore()
 
 
   def mouseMoveEvent(self, event: QtGui.QMouseEvent):
-    self.ignore()
+    event.ignore()
 
 
   def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent):
-    self.ignore()
+    event.ignore()
 
 
   def enterEvent(self, event: QtGui.QEnterEvent):
-    self.ignore()
+    event.ignore()
 
 
   def leaveEvent(self, event: QEvent):
-    self.ignore()
+    event.ignore()
 
 
   def hoverEnterEvent(self, event: QtGui.QHoverEvent):
-    self.ignore()
+    event.ignore()
 
 
   def hoverLeaveEvent(self, event: QtGui.QHoverEvent):
-    self.ignore()
+    event.ignore()
 
 
   def hoverMoveEvent(self, event: QtGui.QHoverEvent):
-    self.ignore()
+    event.ignore()
 
 
   def keyPressEvent(self, event: QtGui.QKeyEvent):
-    self.ignore()
+    event.ignore()
 
 
   def keyReleaseEvent(self, event: QtGui.QKeyEvent):
-    self.ignore()
+    event.ignore()

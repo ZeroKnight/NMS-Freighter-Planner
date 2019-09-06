@@ -166,50 +166,50 @@ class Tool(QObject):
     et = event.type()
     if et in _eventDict:
       _eventDict[et](event)
-      return True
-    else:
-      return False
+      if event.isAccepted():
+        return True
+    return False
 
 
   def mousePressEvent(self, event: QtGui.QMouseEvent):
-    return False
+    self.ignore()
 
 
   def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
-    return False
+    self.ignore()
 
 
   def mouseMoveEvent(self, event: QtGui.QMouseEvent):
-    return False
+    self.ignore()
 
 
   def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent):
-    return False
+    self.ignore()
 
 
   def enterEvent(self, event: QtGui.QEnterEvent):
-    return False
+    self.ignore()
 
 
   def leaveEvent(self, event: QEvent):
-    return False
+    self.ignore()
 
 
   def hoverEnterEvent(self, event: QtGui.QHoverEvent):
-    return False
+    self.ignore()
 
 
   def hoverLeaveEvent(self, event: QtGui.QHoverEvent):
-    return False
+    self.ignore()
 
 
   def hoverMoveEvent(self, event: QtGui.QHoverEvent):
-    return False
+    self.ignore()
 
 
   def keyPressEvent(self, event: QtGui.QKeyEvent):
-    return False
+    self.ignore()
 
 
   def keyReleaseEvent(self, event: QtGui.QKeyEvent):
-    return False
+    self.ignore()

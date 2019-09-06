@@ -29,6 +29,7 @@ their behavior. Events are forwarded by the Editor to the active Tool.
 
 from PySide2 import QtGui
 from PySide2.QtCore import QEvent, QObject
+from PySide2.QtGui import QIcon, QKeySequence
 from PySide2.QtWidgets import QAction
 
 # TBD: Should we inherit from or compose a QAction to handle icon, shortcut,
@@ -40,7 +41,7 @@ class Tool(QObject):
   inspecting its contents.
   """
 
-  def __init__(self, name: str, icon: QIcon, shortcut: QtGui.QKeySequence=None,
+  def __init__(self, name: str, icon: QIcon, shortcut: QKeySequence=None,
                parent: QObject=None):
     """Constructor."""
 
@@ -53,7 +54,21 @@ class Tool(QObject):
     self._statusTip = None
 
     if shortcut is None:
-      self._shortcut = QtGui.QKeySequence()
+      self._shortcut = QKeySequence()
+
+    self._eventDict = {
+      QEvent.MouseButtonPress: __class__.mousePressEvent,
+      QEvent.MouseButtonRelease: __class__.mouseReleaseEvent,
+      QEvent.MouseMove: __class__.mouseMoveEvent,
+      QEvent.MouseButtonDblClick: __class__.mouseDoubleClickEvent,
+      QEvent.Enter: __class__.enterEvent,
+      QEvent.Leave: __class__.leaveEvent,
+      QEvent.HoverEnter: __class__.hoverEnterEvent,
+      QEvent.HoverLeave: __class__.hoverLeaveEvent,
+      QEvent.HoverMove: __class__.hoverMoveEvent,
+      QEvent.KeyPress: __class__.keyPressEvent,
+      QEvent.KeyRelease: __class__.keyReleaseEvent
+    }
 
 
   def name(self) -> str:
@@ -104,16 +119,16 @@ class Tool(QObject):
     self._enabled = enabled
 
 
-  def shortcut(self) -> QtGui.QKeySequence:
+  def shortcut(self) -> QKeySequence:
     """Return the shortcut assigned to this Tool as a QKeySequence."""
 
     return self._shortcut
 
 
-  def setShortcut(self, shortcut: QtGui.QKeySequence):
+  def setShortcut(self, shortcut: QKeySequence):
     """Set the shortcut for this Tool, given as a QKeySequence."""
 
-    if isinstance(shortcut, QtGui.QKeySequence):
+    if isinstance(shortcut, QKeySequence):
       self._shortcut = shortcut
     else:
       raise TypeError(f'shortcut must be a QKeySequence, not {type(shortcut)}')
@@ -149,23 +164,10 @@ class Tool(QObject):
       raise TypeError(f'text must be a str, not {type(text)}')
 
 
-  _eventDict = {
-    QEvent.MouseButtonPress: __class__.mousePressEvent,
-    QEvent.MouseButtonRelease: __class__.mouseReleaseEvent,
-    QEvent.MouseMove: __class__.mouseMoveEvent,
-    QEvent.MouseButtonDblClick: __class__.mouseDoubleClickEvent,
-    QEvent.Enter: __class__.enterEvent,
-    QEvent.Leave: __class__.leaveEvent,
-    QEvent.HoverEnter: __class__.hoverEnterEvent,
-    QEvent.HoverLeave: __class__.hoverLeaveEvent,
-    QEvent.HoverMove: __class__.hoverMoveEvent,
-    QEvent.KeyPress: __class__.keyPressEvent,
-    QEvent.KeyRelease: __class__.keyReleaseEvent
-  }
   def event(self, event: QEvent):
     et = event.type()
-    if et in _eventDict:
-      _eventDict[et](event)
+    if et in self._eventDict:
+      self._eventDict[et](event)
       if event.isAccepted():
         return True
     return False

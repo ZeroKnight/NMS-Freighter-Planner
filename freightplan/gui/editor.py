@@ -40,6 +40,7 @@ from PySide2.QtWidgets import (
 from freightplan import GRID_SIZE
 from freightplan.plan import Plan
 from freightplan.gui.tile import Tile
+from freightplan.gui.tool import Tool
 
 # TEMP
 import freightplan.gui.resources_rc

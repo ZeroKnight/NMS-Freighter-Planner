@@ -27,7 +27,7 @@ Classes that subclass Tool will override the usual events in order to define
 their behavior. Events are forwarded by the Editor to the active Tool.
 """
 
-from PySide2 import QtGui
+from PySide2 import QtGui, QtWidgets
 from PySide2.QtCore import QEvent, QObject
 from PySide2.QtGui import QIcon, QKeySequence
 from PySide2.QtWidgets import QAction
@@ -57,17 +57,17 @@ class Tool(QObject):
       self._shortcut = QKeySequence()
 
     self._eventDict = {
-      QEvent.MouseButtonPress: __class__.mousePressEvent,
-      QEvent.MouseButtonRelease: __class__.mouseReleaseEvent,
-      QEvent.MouseMove: __class__.mouseMoveEvent,
-      QEvent.MouseButtonDblClick: __class__.mouseDoubleClickEvent,
-      QEvent.Enter: __class__.enterEvent,
-      QEvent.Leave: __class__.leaveEvent,
-      QEvent.HoverEnter: __class__.hoverEnterEvent,
-      QEvent.HoverLeave: __class__.hoverLeaveEvent,
-      QEvent.HoverMove: __class__.hoverMoveEvent,
-      QEvent.KeyPress: __class__.keyPressEvent,
-      QEvent.KeyRelease: __class__.keyReleaseEvent
+      QEvent.GraphicsSceneMousePress: self.mousePressEvent,
+      QEvent.GraphicsSceneMouseRelease: self.mouseReleaseEvent,
+      QEvent.GraphicsSceneMouseMove: self.mouseMoveEvent,
+      QEvent.GraphicsSceneMouseDoubleClick: self.mouseDoubleClickEvent,
+      QEvent.GraphicsSceneHoverEnter: self.hoverEnterEvent,
+      QEvent.GraphicsSceneHoverLeave: self.hoverLeaveEvent,
+      QEvent.GraphicsSceneHoverMove: self.hoverMoveEvent,
+      QEvent.Enter: self.enterEvent,
+      QEvent.Leave: self.leaveEvent,
+      QEvent.KeyPress: self.keyPressEvent,
+      QEvent.KeyRelease: self.keyReleaseEvent
     }
 
 
@@ -173,19 +173,19 @@ class Tool(QObject):
     return False
 
 
-  def mousePressEvent(self, event: QtGui.QMouseEvent):
+  def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     event.ignore()
 
 
-  def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
+  def mouseReleaseEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     event.ignore()
 
 
-  def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+  def mouseMoveEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     event.ignore()
 
 
-  def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent):
+  def mouseDoubleClickEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent):
     event.ignore()
 
 
@@ -197,15 +197,15 @@ class Tool(QObject):
     event.ignore()
 
 
-  def hoverEnterEvent(self, event: QtGui.QHoverEvent):
+  def hoverEnterEvent(self, event: QtWidgets.QGraphicsSceneHoverEvent):
     event.ignore()
 
 
-  def hoverLeaveEvent(self, event: QtGui.QHoverEvent):
+  def hoverLeaveEvent(self, event: QtWidgets.QGraphicsSceneHoverEvent):
     event.ignore()
 
 
-  def hoverMoveEvent(self, event: QtGui.QHoverEvent):
+  def hoverMoveEvent(self, event: QtWidgets.QGraphicsSceneHoverEvent):
     event.ignore()
 
 

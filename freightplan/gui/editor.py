@@ -516,13 +516,14 @@ class Editor(QGraphicsScene):
     else:
       raise ValueError(f'Grid position out of bounds: {pos.x()}, {pos.y()}')
 
+
   # Pass events to the current tool first, as they typically handle most
   # Editor events.
   def event(self, event: QEvent):
     accepted = False
     tool = self.currentTool()
     if tool is not None:
-      accepted = QApplication.sendEvent(self.currentTool(), event)
+      accepted = tool.event(event)
     return True if accepted else super().event(event)
 
 

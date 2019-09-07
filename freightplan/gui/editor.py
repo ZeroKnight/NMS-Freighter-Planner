@@ -536,6 +536,17 @@ class Editor(QGraphicsScene):
 
     if event.type() == QEvent.KeyPress:
       if QApplication.focusObject() != self.view:
-        self.currentTool().keyPressEvent(event)
-        return False
+        tool = self.currentTool()
+        if tool is not None:
+          self.currentTool().keyPressEvent(event)
+        else:
+          event.ignore()
+        if event.isAccepted():
+          return True
+        else:
+          if event.key() == Qt.Key_B:
+            from freightplan.gui.brushtool import BrushTool
+            self._currentTool = BrushTool('Brush', None)
+            self._currentTool.setEditor(self)
+          return False
     return super().eventFilter(watched, event)

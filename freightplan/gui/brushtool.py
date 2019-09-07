@@ -20,11 +20,12 @@ A Tool that places Tiles on an Editor's editing area.
 """
 
 from PySide2 import QtGui
-from PySide2.QtCore import Qt
+from PySide2.QtCore import QPointF, Qt
 from PySide2.QtGui import QTransform
-from PySide2.QtWidgets import QGraphicsSceneMouseEvent:
+from PySide2.QtWidgets import QGraphicsSceneMouseEvent
 
 from freightplan.gui.tile import Tile
+from freightplan.gui.tool import Tool
 
 class BrushTool(Tool):
   """A Tool that places Tiles on an Editor's editing area."""
@@ -47,17 +48,17 @@ class BrushTool(Tool):
     item = editor.itemAtGridPos(coord, QTransform())
     if isinstance(item, Tile):
       # TODO: Handle different rotations
-      if item.pixmap().cacheKey() != tileBrush.cacheKey():
+      if item.pixmap().cacheKey() != editor._tileBrush.cacheKey():
         editor.removeTile(coord)
       else:
         return False
-    editor.placeTile(Tile(tileBrush, editor.editArea), coord)
+    editor.placeTile(Tile(editor._tileBrush, editor.editArea), coord)
     return True
 
 
   def handleRightButton(self, pos: QPointF):
     """Handles the right mouse button for the Editor area.
-    
+
     Returns whether or not the calling event should be accepted.
     """
 

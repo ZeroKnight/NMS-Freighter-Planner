@@ -35,6 +35,8 @@ class BrushTool(Tool):
 
     super().__init__(self, *args)
     self.lastTilePos = None
+    self._selectedTile = None
+    self._tileRotation = 0
 
 
   def handleLeftButton(self, pos: QPointF) -> bool:
@@ -48,11 +50,11 @@ class BrushTool(Tool):
     item = editor.itemAtGridPos(coord, QTransform())
     if isinstance(item, Tile):
       # TODO: Handle different rotations
-      if item.pixmap().cacheKey() != editor._tileBrush.cacheKey():
+      if item.pixmap().cacheKey() != self._selectedTile.cacheKey():
         editor.removeTile(coord)
       else:
         return False
-    editor.placeTile(Tile(editor._tileBrush, editor.editArea), coord)
+    editor.placeTile(Tile(self._selectedTile, editor.editArea), coord)
     return True
 
 
@@ -116,10 +118,10 @@ class BrushTool(Tool):
     editor = self._editor
     if event.key() == Qt.Key_R:
       if event.modifiers() & Qt.ShiftModifier:
-        editor._tileRotation -= 90
+        self._tileRotation -= 90
       else:
-        editor._tileRotation += 90
-      editor._tileRotation %= 360
+        self._tileRotation += 90
+      self._tileRotation %= 360
       editor.editArea.update()
       return True
     else:

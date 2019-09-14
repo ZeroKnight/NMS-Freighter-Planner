@@ -342,13 +342,18 @@ class EditArea(QGraphicsRectItem):
     """
 
     super().paint(painter, option, widget)
-    pixmap = self.editor._tileBrush
+
+    tool = self.editor.currentTool()
+    if tool is None:
+      return
+
+    pixmap = tool._selectedTile
     if self._hoveredCell and pixmap:
       scenePos = Editor.gridToScene(self._hoveredCell)
       fragment = QPainter.PixmapFragment.create(
         scenePos + QPointF(pixmap.width() / 2, pixmap.height() / 2),
         QRectF(QPointF(0, 0), pixmap.size()),
-        rotation=self.editor._tileRotation,
+        rotation=tool._tileRotation,
         opacity=0.75
       )
       painter.drawPixmapFragments(fragment, 1, pixmap)
@@ -398,8 +403,6 @@ class Editor(QGraphicsScene):
     self.view = EditorView(self)
     self.setBackgroundBrush(QBrush(Qt.lightGray))
 
-    self._tileBrush = None
-    self._tileRotation = 0
     self._currentFloor = 0
     self._currentTool = None
 
@@ -450,8 +453,11 @@ class Editor(QGraphicsScene):
       pixmap: The tile pixmap to set the brush to.
     """
 
-    self._tileBrush = pixmap
-    self._tileRotation = 0
+    # TEMP: Replace with proper methods
+    tool = self.currentTool()
+    if tool is not None:
+      tool._selectedTile = pixmap
+      tool._tileRotation = 0
 
 
   def currentFloor(self) -> 'Floor':
@@ -492,7 +498,7 @@ class Editor(QGraphicsScene):
     if self.validGridPos(pos):
       self.currentFloor().cellAt(pos).setTile(tile)
       tile.setVisible(True)
-      tile.setRotation(self._tileRotation)
+      tile.setRotation(self.currentTool()._tileRotation)
       scenePos = self.gridToScene(pos)
       tile.setPos(scenePos)
       print(f'Placed tile at {pos!s}')

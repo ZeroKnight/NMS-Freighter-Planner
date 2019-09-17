@@ -46,7 +46,7 @@ class Tool(QObject):
     super().__init__(parent)
     self._name = name
     self._editor = None
-    self._active = False
+    self._enabled = False
 
     self.action = QAction(icon, name, parent)
     self.action.setShortcut(shortcut)

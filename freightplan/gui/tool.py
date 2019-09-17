@@ -103,11 +103,12 @@ class Tool(QObject):
 
 
   def event(self, event: QEvent):
-    et = event.type()
-    if et in self._eventDict:
-      self._eventDict[et](event)
-      if event.isAccepted():
-        return True
+    if self.enabled():
+      et = event.type()
+      if et in self._eventDict:
+        self._eventDict[et](event)
+        if event.isAccepted():
+          return True
     return False
 
 

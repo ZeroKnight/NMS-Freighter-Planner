@@ -32,8 +32,6 @@ from PySide2.QtCore import QEvent, QObject
 from PySide2.QtGui import QIcon, QKeySequence
 from PySide2.QtWidgets import QAction
 
-# TBD: Should we inherit from or compose a QAction to handle icon, shortcut,
-# etc.? Would a QAction be correct to use at all in this case?
 class Tool(QObject):
   """Base class for an Editor tool.
 
@@ -41,20 +39,17 @@ class Tool(QObject):
   inspecting its contents.
   """
 
-  def __init__(self, name: str, icon: QIcon, shortcut: QKeySequence=None,
-               parent: QObject=None):
+  def __init__(self, name: str, icon: QIcon,
+               shortcut: QKeySequence=QKeySequence(), parent: QObject=None):
     """Constructor."""
 
     super().__init__(parent)
     self._name = name
-    self._icon = icon
     self._editor = None
     self._active = False
-    self._toolTip = None
-    self._statusTip = None
 
-    if shortcut is None:
-      self._shortcut = QKeySequence()
+    self.action = QAction(icon, name, parent)
+    self.action.setShortcut(shortcut)
 
     self._eventDict = {
       QEvent.GraphicsSceneMousePress: self.mousePressEvent,
@@ -83,18 +78,6 @@ class Tool(QObject):
     self._name = name
 
 
-  def icon(self) -> QIcon:
-    """Return the icon of the Tool."""
-
-    return self._icon
-
-
-  def setIcon(self, icon: QIcon):
-    """Set the icon of the Tool."""
-
-    self._icon = icon
-
-
   def editor(self) -> str:
     """Return the Editor that the Tool is currently bound to."""
 
@@ -117,51 +100,6 @@ class Tool(QObject):
     """Set whether or not the Tool is enabled."""
 
     self._enabled = enabled
-
-
-  def shortcut(self) -> QKeySequence:
-    """Return the shortcut assigned to this Tool as a QKeySequence."""
-
-    return self._shortcut
-
-
-  def setShortcut(self, shortcut: QKeySequence):
-    """Set the shortcut for this Tool, given as a QKeySequence."""
-
-    if isinstance(shortcut, QKeySequence):
-      self._shortcut = shortcut
-    else:
-      raise TypeError(f'shortcut must be a QKeySequence, not {type(shortcut)}')
-
-
-  def toolTip(self) -> str:
-    """Return the tooltip for this Tool."""
-
-    return self._toolTip
-
-
-  def setToolTip(self, text: str):
-    """Set the tooltip for this Tool."""
-
-    if isinstance(text, str):
-      self._toolTip = text
-    else:
-      raise TypeError(f'text must be a str, not {type(text)}')
-
-
-  def statusTip(self) -> str:
-    """Return the status tip for this Tool."""
-
-    return self._statusTip
-
-
-  def setStatusTip(self, text: str):
-    """Set the status tip for this Tool."""
-
-    if isinstance(text, str):
-      self._statusTip = text
-    else:
-      raise TypeError(f'text must be a str, not {type(text)}')
 
 
   def event(self, event: QEvent):
